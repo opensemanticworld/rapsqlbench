@@ -74,8 +74,8 @@ src_dir=$(dirname "$src_path")
 src_dir_name=$(basename "$src_dir") # = graph_name
 rdfsp_jar=$cwd/rdfsp/rdfs-processor.jar
 rdf2pg_jar=$cwd/rdf2pg/rdf2pg.jar
-ypg2rapsql_dir=$cwd/ypg2rapsql
-ypg2rapsql_sh="$ypg2rapsql_dir/ypg2rapsql.sh"
+rdf2rapsql_dir=$cwd/rdf2rapsql
+ypg2rapsql_sh="$rdf2rapsql_dir/ypg2rapsql.sh"
 
 # Change directory to data source directory
 cd "$src_dir" || exit  

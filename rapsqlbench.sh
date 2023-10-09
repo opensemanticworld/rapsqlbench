@@ -18,7 +18,17 @@ is_positive_integer() {
 # Prompt for a positive integer if no -t flag was set
 if [[ $# -eq 0 ]]; then
   while true; do
-    read -p "Please enter a positive integer: " input
+    read -r -p "
+            ATENTION!
+              - the amount of triples depends on SP2B, 
+              - there is no warranty of exact triple count,
+              - values are only approximations,
+              - values lower than 1k have no specific accuaracy
+              - high values will need massive RAM and disk space,
+              - e.g., 1m need apx. x GB RAM and x GB disk space.
+            -------------------------------------------------------------
+
+              Please enter a positive integer to proceed: " input
     if is_positive_integer "$input"; then
       triples=$input
       break
@@ -57,10 +67,17 @@ get_ts() {
   echo "$ts"
 }
 
+################ ENV SETUP ################
+# Provide realpath, basedir and set as cwd
+real_path=$(realpath "$0")
+basedir=$(dirname "$real_path")
+echo "real_path: $real_path"
+echo "basedir: $basedir"
+cd "$basedir" || exit 0
+cwd=$(pwd)
+###########################################
 
 ### MEASUREMENT START ###
-# Set cwd
-cwd=$(pwd)
 # Create project dirs
 tgt_name=sp"$triples"
 data_dir=$cwd/data/"$tgt_name"
@@ -113,7 +130,7 @@ echo_tee "SP2B, END, $(get_ts)"
 # Target: rapsql database
 echo_tee "RDF2RAPSQL, START, $(get_ts)"
 # Run rdf2rapsql
-rdf2rapsql=$(realpath "$cwd/rdf2rapsql.sh")
+rdf2rapsql=$(realpath "$cwd/rdf2rapsql/rdf2rapsql.sh")
 "$rdf2rapsql" -t "$triples" | tee -a "$measurement_file" || exit 1
 echo_tee "RDF2RAPSQL, END, $(get_ts)"
 
