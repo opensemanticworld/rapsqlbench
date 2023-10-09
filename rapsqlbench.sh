@@ -1,10 +1,10 @@
 #!/bin/bash
+# Author:   Andreas Raeder
+# License:  Apache License 2.0
+# Usage:    /bin/bash <PATH_TO_rapsqlbench.sh" <POSITIVE_INTEGER>
 
-# Author:  Andreas Raeder
-
-# Input using flag and value
-# https://stackoverflow.com/a/14203146
-# https://stackoverflow.com/a/33419280
+# Positive input integer to set the number of triples
+input=$1
 
 # Function to check if a value is a positive integer
 is_positive_integer() {
@@ -15,49 +15,18 @@ is_positive_integer() {
   fi
 }
 
-# Prompt for a positive integer if no -t flag was set
-if [[ $# -eq 0 ]]; then
-  while true; do
-    read -r -p "
-            ATENTION!
-              - the amount of triples depends on SP2B, 
-              - there is no warranty of exact triple count,
-              - values are only approximations,
-              - values lower than 1k have no specific accuaracy
-              - high values will need massive RAM and disk space,
-              - e.g., 1m need apx. x GB RAM and x GB disk space.
-            -------------------------------------------------------------
-
-              Please enter a positive integer to proceed: " input
-    if is_positive_integer "$input"; then
-      triples=$input
-      break
-    else
-      echo "Error: Invalid input. Please enter a positive integer."
-    fi
-  done
-else
-  # Parse command line arguments
-  while getopts ":t:" opt; do
-    case $opt in
-      t)
-        if is_positive_integer "$OPTARG"; then
-          triples=$OPTARG
-        else
-          echo "Error: Invalid argument for -t. Please provide a positive integer." >&2
-          exit 1
-        fi
-        ;;
-      \?)
-        echo "Invalid option: -$OPTARG" >&2
-        exit 1
-        ;;
-      :)
-        echo "Option -$OPTARG requires an argument." >&2
-        exit 1
-        ;;
-    esac
-  done
+# Check if input exists
+if [[ -z "$input" ]]; then
+  echo "Error: No input provided. Please provide a positive integer." >&2
+  exit 1
+else 
+  # Check if input is a positive integer
+  if is_positive_integer "$input"; then
+    triples=$input
+  else
+    echo "Error: Invalid input. Please provide a positive integer." >&2
+    exit 1
+  fi
 fi
 
 # Function to get the current timestamp
