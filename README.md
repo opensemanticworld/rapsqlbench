@@ -35,4 +35,3 @@ htop
 |  250m |  sp250000000 |  docker exec rapsqldb-container mnt/rapsqlbench/rapsqlbench.sh 250000000 |  select drop_graph('sp250000000',true); |
 |  500m |  sp500000000 |  docker exec rapsqldb-container mnt/rapsqlbench/rapsqlbench.sh 500000000 |  select drop_graph('sp500000000',true); |
 |   1bn | sp1000000000 | docker exec rapsqldb-container mnt/rapsqlbench/rapsqlbench.sh 1000000000 | select drop_graph('sp1000000000',true); |
-```bash
