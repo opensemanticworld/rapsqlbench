@@ -57,14 +57,23 @@ measurement_dir=$cwd/measurement/"$tgt_name"
 measurement_file="$measurement_dir"/measurement.csv
 # Create data and measurement dirs by triples
 mkdir -p "$cwd"/{data,measurement}/"$tgt_name"
-# Create measurement file
-echo "Process, Type, Value" | tee "$measurement_file"
+
+# # Create measurement json from schema
+# schema_json="$basedir"/schema.json
+# measurement_json="$measurement_dir"/measurement.json
+# jsonpointer=$(jq -r '.["measurement.json"]' "$schema_json")
+
+# echo "$jsonpointer"
+
+# Create measurement csv
+echo "Process, Parameter, Value" | tee "$measurement_file"
 echo_tee "MEASUREMENT, START, $(get_ts)" 
 echo_tee "MEASUREMENT, SCRIPT, $real_path"
 echo_tee "MEASUREMENT, BASEDIR, $basedir"
 echo_tee "MEASUREMENT, CWD, $cwd"
 echo_tee "MEASUREMENT, INPUT, $triples" 
 echo_tee "MEASUREMENT, PID, $$" 
+
 
 
 ### SP2B START ###
@@ -74,6 +83,7 @@ sp2b=$cwd/sp2b/bin
 sp2b_txt=$cwd/measurement/"$tgt_name"/sp2b.txt
 echo_tee "SP2B, START, $(get_ts)"
 echo_tee "SP2B, DIR, $sp2b"
+
 # Change to sp2b dir
 cd "$sp2b" || exit
 # Run sp2b
