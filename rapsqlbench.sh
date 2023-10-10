@@ -36,12 +36,15 @@ get_ts() {
   echo "$ts"
 }
 
+# Helper function to attach content to measurement file
+echo_tee() {
+  echo "$1" | tee -a "$measurement_file"
+}
+
 ################ ENV SETUP ################
 # Provide realpath, basedir and set as cwd
 real_path=$(realpath "$0")
 basedir=$(dirname "$real_path")
-echo "real_path: $real_path"
-echo "basedir: $basedir"
 cd "$basedir" || exit 0
 cwd=$(pwd)
 ###########################################
@@ -56,14 +59,9 @@ measurement_file="$measurement_dir"/measurement.csv
 mkdir -p "$cwd"/{data,measurement}/"$tgt_name"
 # Create measurement file
 echo "Process, Type, Value" | tee "$measurement_file"
-
-# Helper function to attach content to measurement file
-echo_tee() {
-  echo "$1" | tee -a "$measurement_file"
-}
-
-# Measurement start
 echo_tee "MEASUREMENT, START, $(get_ts)" 
+echo_tee "MEASUREMENT, SCRIPT, $real_path"
+echo_tee "MEASUREMENT, BASEDIR, $basedir"
 echo_tee "MEASUREMENT, CWD, $cwd"
 echo_tee "MEASUREMENT, INPUT, $triples" 
 echo_tee "MEASUREMENT, PID, $$" 

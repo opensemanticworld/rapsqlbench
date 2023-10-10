@@ -92,9 +92,9 @@ WRIETESQL_ABS=$(realpath "$WRITESQL")
 # realpath of basedir as single line
 BASEDIR=$(dirname "$EXEC")
 $WRIETESQL_ABS "$graph_name" "$nres_instance" "$nlit_instance" "$nbn_instance" "$edtp_instance" "$eop_instance" || exit 1
-echo "YPG2RAPSQL, SQL, $WRIETESQL_ABS" 
+echo "YPG2RAPSQL, SCRIPT, $WRIETESQL_ABS" 
 
 # Output SQL import file
-echo "YPG2RAPSQL, INSTANCE, $src_dir/import.sql"
+echo "YPG2RAPSQL, SCRIPT, $src_dir/import.sql"
 # Alternative: $graph_name.sql, if yes
 # change static import.sql name in writesql.sh too
