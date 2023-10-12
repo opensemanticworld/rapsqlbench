@@ -6,3 +6,4 @@ aws.txt
 .vscode/
 .terraform/
 .terraform.lock.hcl
+terraform/inventory/
