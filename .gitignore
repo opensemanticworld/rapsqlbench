@@ -3,3 +3,6 @@ sp2b/src/
 data/*
 measurement/*
 aws.txt
+.vscode/
+.terraform/
+.terraform.lock.hcl
