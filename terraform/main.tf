@@ -13,8 +13,8 @@ terraform {
 
 # Configure the AWS Provider to interact with AWS services
 provider "aws" {
-  region  = "eu-central-1"
-  profile = "sysmon-dev-profile"
+  region  = var.aws_region
+  profile = var.aws_profile
 }
 
 # Create a Virtual Private Cloud (VPC) to provide a network for the resources
@@ -29,6 +29,7 @@ resource "aws_vpc" "tf-aws-vpc-1" {
 # Create a subnet within the VPC for the resources
 resource "aws_subnet" "tf-aws-subnet-1" {
   vpc_id     = aws_vpc.tf-aws-vpc-1.id
+  availability_zone = var.aws_availability_zone
   cidr_block = "10.0.0.0/24"
   tags = {
     Name = var.env_tag
@@ -88,7 +89,7 @@ resource "aws_security_group" "tf-aws-sg-1" {
   }
 }
 
-# Add a ssh key pair to the AWS account
+# Add a ssh key pair to the AWS account (optional)
 resource "aws_key_pair" "tf-aws-key-pair-1" {
   key_name   = "sysmon-raeder-rsa-key-1"
   public_key = file("~/.ssh/id_rsa.pub")
@@ -101,7 +102,8 @@ resource "aws_key_pair" "tf-aws-key-pair-1" {
 resource "aws_instance" "tf-aws-ubuntu-instance-1" {
   ami                    = "ami-04e601abe3e1a910f"
   instance_type          = "t2.micro"
-  key_name               = aws_key_pair.tf-aws-key-pair-1.key_name
+  availability_zone      = var.aws_availability_zone
+  key_name               = aws_key_pair.tf-aws-key-pair-1.key_name # change this to var
   vpc_security_group_ids = [aws_security_group.tf-aws-sg-1.id]
   subnet_id              = aws_subnet.tf-aws-subnet-1.id
   depends_on             = [aws_internet_gateway.tf-aws-gw-1]
@@ -124,4 +126,21 @@ resource "aws_eip" "tf-aws-eip-1" {
 resource "local_file" "tf-vm-pubip-1" {
   content  = aws_eip.tf-aws-eip-1.public_ip
   filename = "${path.module}/tf-vm-pubip-1-inventory.txt"
+}
+
+resource "aws_ebs_volume" "tf-aws-ebs-1" {
+  availability_zone = var.aws_availability_zone
+  size              = 1
+  type              = "gp3"
+  iops              = 3000
+  throughput        = 125   #MiB/s
+  tags = {
+    Name = var.env_tag
+  }
+}
+
+resource "aws_volume_attachment" "tf-aws-ebs-1" {
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.tf-aws-ebs-1.id
+  instance_id = aws_instance.tf-aws-ubuntu-instance-1.id
 }

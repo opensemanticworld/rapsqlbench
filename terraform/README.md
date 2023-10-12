@@ -15,6 +15,9 @@
 
 ## 1. Prerequisites
 
+<details>
+<summary>Details</summary>
+
 - [Terraform Install](https://learn.hashicorp.com/tutorials/terraform/install-cli)
   - `gnupg`
   - `software-properties-common`
@@ -26,12 +29,14 @@
     - [Configure SSO](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)
     - [AWS CLI Config](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 
+</details>
+
 ## 2. Installation
 
-<details>
-<summary>2.1 Terraform CLI</summary>
-
 ### 2.1 Terraform CLI
+
+<details>
+<summary>Details</summary>
 
 1. Terraform prerequisites to verify HashiCorp's GPG signature:
 
@@ -77,10 +82,10 @@
 
 </details>
 
-<details>
-<summary>2.2 AWS CLI</summary>
-
 ### 2.2 AWS CLI
+
+<details>
+<summary>Details</summary>
 
 1. To install the AWS CLI, run the following commands:
 
@@ -103,14 +108,32 @@
     sudo rm -rf ./aws
     ```
 
-4. To configure the AWS CLI, run the following command:
+</details>
+
+## 3. Usage
+
+1. To configure the AWS CLI, run the following command:
 
     ```bash
     aws configure sso
     ```
 
-5. Follow the prompts
+2. Follow the prompts
 
-</details>
+3. To initialize Terraform, run the following command:
 
-## 3. Usage
+    ```bash
+    terraform init
+    ```
+
+4. To create the infrastructure, run the following command:
+
+    ```bash
+    terraform apply
+    ```
+
+5. To install required software for `rapsqlbench` using `ansible`, run:
+
+    ```bash
+    ansible-playbook -i terraform/inventory/<vm-X>.txt deploy.yml
+    ```

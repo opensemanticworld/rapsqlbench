@@ -1,0 +1,153 @@
+# Begin: Prerequisites
+- hosts: all
+  gather_facts: False
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: Verify SSH connection
+      ansible.builtin.wait_for_connection:
+      
+    - name: Cloud-init done
+      ansible.builtin.raw:  while [ ! -f /var/lib/cloud/instance/boot-finished]; do sleep 10s; done
+      changed_when: false
+
+    - name: Check if Python 3 symlink exists
+      ansible.builtin.stat:
+        path: /usr/bin/python
+      register: python_symlink
+
+    - name: Create Python 3 symlink if not exists
+      ansible.builtin.raw: ln -s /usr/bin/python3 /usr/bin/python
+      when: not python_symlink.stat.exists
+# End: Prerequisites
+
+# NODE INSTALL SPECIFIC VERSION https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-2-installing-node-js-with-apt-using-a-nodesource-ppa
+# Begin: Install Software
+- hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    # - name: Create /mnt directory
+    #   ansible.builtin.file:
+    #     path: /mnt
+    #     state: directory
+    #     owner: root
+    #     group: root
+    #     mode: '0751'
+
+    - name: Create an ext4 filesystem on /dev/xvdh
+      community.general.filesystem:
+        fstype: ext4
+        state: present
+        dev: /dev/xvdh
+
+    - name: Fetch the UUID of /dev/xvdh
+      command: blkid -s UUID -o value /dev/xvdh
+      changed_when: false
+      register: blkid_out
+
+    - name: Mount /dev/xvdh by UUID
+      ansible.posix.mount:
+        path: /mnt
+        src: UUID={{ blkid_out.stdout }}
+        fstype: ext4
+        opts: defaults
+        state: mounted
+
+#     # TODO: Delete installation of pip, if unnecessary
+#     - name: Install pip
+#       apt: 
+#         name: python3-pip
+#         update_cache: yes
+#         state: latest
+#       tags: python
+
+#     - name: Install required packages
+#       apt:
+#         name:
+#           - ca-certificates
+#           - curl
+#           - gnupg
+#         state: present
+
+#     - name: Check if Docker's official GPG key exists
+#       ansible.builtin.stat:
+#         path: /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
+#       register: gpg_check
+
+#     - name: Add Docker's official GPG key
+#       shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
+#       when: not gpg_check.stat.exists
+
+#     - name: Add Docker repository
+#       apt_repository:
+#         repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+#         state: present
+#       when: not gpg_check.stat.exists
+
+#     - name: Install Docker packages
+#       apt:
+#         name:
+#           - docker-ce
+#           - docker-ce-cli
+#           - containerd.io
+#           - docker-buildx-plugin
+#           - docker-compose
+#         update_cache: yes
+
+#     - name: Add user to the 'docker' group
+#       user:
+#         name: ubuntu
+#         groups: docker
+#       tags: docker
+
+# # Begin: Change Docker Storage Location
+# - hosts: all
+#   user: ubuntu
+#   become: yes
+#   become_user: root
+#   tasks:
+#     # check if the new docker storage location exists
+#     - name: Check if desired docker storage location exists
+#       ansible.builtin.stat:
+#         path: /mnt/docker/
+#       register: dir_check
+#       tags: docker
+
+#     - name: Create docker storage location if not exists
+#       ansible.builtin.file:
+#         path: /mnt/docker
+#         state: directory
+#       tags: docker
+#         # mode: '0755'
+
+#     - name: Stop docker service
+#       ansible.builtin.systemd:
+#         state: stopped
+#         name: docker
+#       tags: docker
+#       when: not dir_check.stat.exists
+
+#     - name: Copy docker data to new location
+#       ansible.builtin.shell: rsync -aP /var/lib/docker/ /mnt/docker
+#       tags: docker
+#       when: not dir_check.stat.exists
+
+#     - name: Change docker storage location
+#       ansible.builtin.lineinfile:
+#         path: /lib/systemd/system/docker.service
+#         regexp: '^ExecStart='
+#         line: ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --data-root /mnt/docker
+#       tags: docker
+#       when: not dir_check.stat.exists
+
+#     - name: Start docker with reloaded daemon
+#       ansible.builtin.systemd:
+#         daemon_reload: true
+#         state: started
+#         name: docker
+#       tags: docker
+#       when: not dir_check.stat.exists
+# # End: Change Docker Storage Location

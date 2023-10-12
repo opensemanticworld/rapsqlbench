@@ -6,4 +6,6 @@ aws.txt
 .vscode/
 .terraform/
 .terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
 terraform/inventory/

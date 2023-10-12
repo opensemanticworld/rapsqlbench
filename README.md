@@ -1,9 +1,16 @@
 # RAPSQL Benchmark
 
 - [RAPSQL Benchmark](#rapsql-benchmark)
+  - [Prerequisites](#prerequisites)
   - [System monitoring](#system-monitoring)
   - [Measurement Monitoring](#measurement-monitoring)
   - [Usage](#usage)
+
+## Prerequisites
+
+- docker
+- rapsql
+- rapsqlbench
 
 ## System monitoring
 
