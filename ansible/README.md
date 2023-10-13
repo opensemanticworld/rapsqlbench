@@ -4,6 +4,7 @@
   - [Prerequisites](#prerequisites)
   - [2. Deployment Description](#2-deployment-description)
   - [2. Configuration](#2-configuration)
+  - [3. Implementation](#3-implementation)
   - [2. Usage](#2-usage)
 
 ## Prerequisites
@@ -61,6 +62,10 @@ To configure the AWS EBS disk 'xvdh' based on the output of the `lsblk` command,
 5. Finally, you can verify that the disk is correctly configured by running the `df -h` command, which will display the mounted disks and their usage.
 
 Please note that these steps assume you have the necessary permissions to perform disk configuration operations.
+
+## 3. Implementation
+
+[Stackoverflow Mount Disk](https://stackoverflow.com/a/69947951)
 
 ## 2. Usage
 
