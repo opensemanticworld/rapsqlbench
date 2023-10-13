@@ -1,0 +1,10 @@
+# Begin: VARTEST
+- hosts: all
+  gather_facts: false
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: print variables
+      debug:
+        msg: "triples: {{ triples }}"

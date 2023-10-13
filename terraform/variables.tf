@@ -12,7 +12,7 @@ variable "aws_availability_zone" {
 
 variable "aws_profile" {
   type    = string
-  default = "sysarch-profile" # Change this to your profile name from sso session
+  default = "sysarch" # Change this to your profile name from sso session
 }
 
 # Enviorenment 
@@ -38,12 +38,13 @@ variable "vm_map" {
     "vm1" = {
       ami           = "ami-04e601abe3e1a910f"
       instance_type = "t2.micro"
-      ebs_size      = 1
+      ebs_size      = 8
     }
-    "vm2" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "t2.micro"
-      ebs_size      = 2
-    }
+    ### Example for multiple VMs
+    # "vm2" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "t2.micro"
+    #   ebs_size      = 2
+    # }
   }
 }

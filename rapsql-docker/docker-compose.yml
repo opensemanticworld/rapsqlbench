@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  rapsql:
+    container_name: rapsqlcontainer
+    image: opensemanticworld/rapsql:v0.1.0
+    ports:
+      - "${RAPSQL_PORT}:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - shared_preload_libraries=age 
+    volumes:
+      - /mnt/pgdata:/var/lib/postgresql/data
+      - /mnt/benchmark:/mnt
+    restart: unless-stopped
+

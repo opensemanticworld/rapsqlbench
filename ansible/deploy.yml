@@ -1,6 +1,6 @@
 # Begin: Prerequisites
 - hosts: all
-  gather_facts: False
+  gather_facts: false
   user: ubuntu
   become: yes
   become_user: root
@@ -29,14 +29,6 @@
   become: yes
   become_user: root
   tasks:
-    # - name: Create /mnt directory
-    #   ansible.builtin.file:
-    #     path: /mnt
-    #     state: directory
-    #     owner: root
-    #     group: root
-    #     mode: '0751'
-
     - name: Create an ext4 filesystem on /dev/xvdh
       community.general.filesystem:
         fstype: ext4
@@ -56,13 +48,23 @@
         opts: defaults
         state: mounted
 
-#     # TODO: Delete installation of pip, if unnecessary
-#     - name: Install pip
-#       apt: 
-#         name: python3-pip
-#         update_cache: yes
-#         state: latest
-#       tags: python
+    - name: Resize disk of /dev/xvdh
+      filesystem:
+        fstype: ext4
+        dev: /dev/xvdh
+        resizefs: yes
+
+    # deprecated warning is a bug
+    # https://github.com/ansible-collections/ansible.posix/issues/468
+    - name: Synchronization benchmark of rapsqlbench to remote
+      ansible.posix.synchronize:
+        src: ../benchmark
+        dest: /mnt
+
+    - name: Synchronization rapsql-docker of rapsqlbench to remote
+      ansible.posix.synchronize:
+        src: ../rapsql-docker
+        dest: /mnt
 
     - name: Install required packages ca-certificates, curl, gnupg
       apt:
@@ -151,3 +153,63 @@
       tags: docker
       when: not dir_check.stat.exists
 # End: Change Docker Storage Location
+
+
+# Start: Perform rapsql benchmark
+- hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+        # project_src: ../rapsql-docker/docker-compose.yml # WRONG
+        # https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html
+    - name: Deploy rapsql database
+      community.docker.docker_compose:
+        project_src: /mnt/rapsql-docker 
+        project_name: rapsqlbench
+        build: no
+        pull: yes
+      register: rapsqldb
+
+    # - name: Show rapsqldb results
+    #   ansible.builtin.debug:
+    #     var: rapsqldb
+    
+    - name: Verify rapsqldb is running
+      ansible.builtin.assert:
+        that: 
+          - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
+
+    - name: Perform rapsql benchmark by input triple value
+      community.docker.docker_container_exec:
+        container: rapsqlcontainer
+        command: /bin/bash spx.sh {{ triples }}
+        chdir: /mnt
+      register: rapsqlbench
+      
+    - name: Show rapsqlbench results
+      ansible.builtin.debug:
+        var: rapsqlbench
+# End: Perform rapsql benchmark
+
+
+# # Start: Fetch Results
+# - hosts: all
+#   user: ubuntu
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Synchronize measurement
+#       ansible.posix.synchronize:
+#         src: /mnt/benchmark/measurement/
+#         dest: ../measurement
+#         mode: pull
+#         delete: no
+
+#     - name: Synchronize data
+#       ansible.posix.synchronize:
+#         src: /mnt/benchmark/data/
+#         dest: ../data
+#         mode: pull
+#         delete: no
+# # End: Fetch Results

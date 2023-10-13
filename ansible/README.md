@@ -82,3 +82,10 @@ Please note that these steps assume you have the necessary permissions to perfor
     ansible-playbook -i ./inventory/vm1-eip.txt ../ansible/deploy.yml
     ansible-playbook -i ./inventory/vm2-eip.txt ../ansible/deploy.yml
     ```
+
+3. Passing [Ansible Variables via CLI](https://docs.ansible.com/archive/ansible/2.4/playbooks_variables.html#passing-variables-on-the-command-line)
+
+    ```bash
+    ansible-playbook -i ./inventory/vm1-eip.txt ../ansible/vartest.yml -e "triples=1000"
+    ansible-playbook -i ./inventory/vm1-eip.txt ../ansible/deploy.yml -e "triples=1000"
+    ```
