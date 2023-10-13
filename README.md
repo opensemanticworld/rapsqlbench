@@ -7,6 +7,7 @@
 ## 1. Prerequisites
 
 - [AWS Account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 - [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#pip-install)
 - [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
