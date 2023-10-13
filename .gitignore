@@ -1,6 +1,6 @@
 _old/
-# data/*
-# measurement/*
+results/aws/data/*
+results/aws/measurement/*
 benchmark/sp2b/src/*
 benchmark/data/
 benchmark/measurement/
