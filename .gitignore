@@ -1,7 +1,9 @@
 _old/
-sp2b/src/
 data/*
 measurement/*
+benchmark/sp2b/src/
+benchmark/data/
+benchmark/measurement/
 aws.txt
 .vscode/
 .terraform/
