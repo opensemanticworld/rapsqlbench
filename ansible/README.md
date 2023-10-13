@@ -75,3 +75,10 @@ Please note that these steps assume you have the necessary permissions to perfor
     ansible-playbook -i terraform/inventory/vm-pubip-1.txt deploy.yml
     ansible-playbook -i terraform/tf-vm-pubip-1-inventory.txt ansible/deploy.yml 
     ```
+
+2. Inside the `terraform` directory:
+
+    ```bash
+    ansible-playbook -i ./inventory/vm1-eip.txt ../ansible/deploy.yml
+    ansible-playbook -i ./inventory/vm2-eip.txt ../ansible/deploy.yml
+    ```
