@@ -22,7 +22,7 @@
       when: not python_symlink.stat.exists
 # End: Prerequisites
 
-# NODE INSTALL SPECIFIC VERSION https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-2-installing-node-js-with-apt-using-a-nodesource-ppa
+
 # Begin: Install Software
 - hosts: all
   user: ubuntu
@@ -161,8 +161,6 @@
   become: yes
   become_user: root
   tasks:
-        # project_src: ../rapsql-docker/docker-compose.yml # WRONG
-        # https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html
     - name: Deploy rapsql database
       community.docker.docker_compose:
         project_src: /mnt/rapsql-docker 
