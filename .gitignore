@@ -1,6 +1,6 @@
 _old/
-data/*
-measurement/*
+# data/*
+# measurement/*
 benchmark/sp2b/src/*
 benchmark/data/
 benchmark/measurement/
@@ -8,7 +8,9 @@ aws.txt
 .vscode/
 .terraform/
 .terraform.lock.hcl
+.terraform.tfstate.lock.info
 terraform.tfstate
 terraform.tfstate.backup
 terraform/inventory/
 dev/
+
