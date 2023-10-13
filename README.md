@@ -28,8 +28,7 @@
 3. Change directory to `rapsqlbench/terraform` and run `terraform init` to initialize the Terraform configuration:
 
     ```bash
-    cd rapsqlbench/terraform
-    terraform init
+    cd rapsqlbench/terraform; terraform init
     ```
 
 4. Terraform Configuration:
