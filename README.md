@@ -33,7 +33,7 @@
     ```
 
 4. Terraform Configuration:
-   1. Create a `terraform.tfvars` file and setting the variables there, or
+   1. Create a `terraform.tfvars` file and set up your own variables there, or
    2. change the `variables.tf` file to match your desired configuration.
 5. Run `terraform apply` depending on your `.tfvars` or `variables.tf` setup to create the infrastructure.
 
