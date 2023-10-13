@@ -15,7 +15,7 @@
 ## 2. Terraform Graph
 
 ![Terraform Graph](./images/terraform_graph.svg)
-**Terraform AWS Cloud infrastructure of `rapsqlbench`.**
+**Terraform AWS Cloud Infrastructure of `rapsqlbench`.**
 
 ## 3. Usage
 
