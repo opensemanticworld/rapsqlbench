@@ -11,3 +11,4 @@ aws.txt
 terraform.tfstate
 terraform.tfstate.backup
 terraform/inventory/
+dev/
