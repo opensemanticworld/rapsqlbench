@@ -35,16 +35,16 @@ variable "vm_map" {
     ebs_size      = number
   }))
   default = {
-    "vm1" = {
+    "vm1k" = {
       ami           = "ami-04e601abe3e1a910f"
       instance_type = "t2.micro"
       ebs_size      = 8
     }
-    ### Example for multiple VMs
-    # "vm2" = {
-    #   ami           = "ami-04e601abe3e1a910f"
-    #   instance_type = "t2.micro"
-    #   ebs_size      = 2
-    # }
+    ## Example for multiple VMs
+    "vm10k" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "t2.micro"
+      ebs_size      = 8
+    }
   }
 }

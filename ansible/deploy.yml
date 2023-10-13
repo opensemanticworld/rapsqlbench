@@ -193,23 +193,23 @@
 # End: Perform rapsql benchmark
 
 
-# # Start: Fetch Results
-# - hosts: all
-#   user: ubuntu
-#   become: yes
-#   become_user: root
-#   tasks:
-#     - name: Synchronize measurement
-#       ansible.posix.synchronize:
-#         src: /mnt/benchmark/measurement/
-#         dest: ../measurement
-#         mode: pull
-#         delete: no
+# Start: Fetch Results
+- hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: Synchronize measurement from remote
+      ansible.posix.synchronize:
+        src: /mnt/benchmark/measurement/
+        dest: ../results/aws/measurement
+        mode: pull
+        delete: no
 
-#     - name: Synchronize data
-#       ansible.posix.synchronize:
-#         src: /mnt/benchmark/data/
-#         dest: ../data
-#         mode: pull
-#         delete: no
-# # End: Fetch Results
+    - name: Synchronize data from remote
+      ansible.posix.synchronize:
+        src: /mnt/benchmark/data/
+        dest: ../results/aws/data
+        mode: pull
+        delete: no
+# End: Fetch Results
