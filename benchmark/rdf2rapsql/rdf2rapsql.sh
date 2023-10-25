@@ -73,7 +73,7 @@ src_path="$cwd"/data/sp"$triples"/sp"$triples".n3
 src_dir=$(dirname "$src_path") 
 src_dir_name=$(basename "$src_dir") # = graph_name
 rdfsp_jar=$cwd/rdfsp/rdfs-processor.jar
-rdf2pg_jar=$cwd/rdf2pg/rdf2pg.jar
+rdf2pg_jar=$cwd/rdf2pg/rdf2pg-v0.1.0-jar-with-dependencies.jar
 rdf2rapsql_dir=$cwd/rdf2rapsql
 ypg2rapsql_sh="$rdf2rapsql_dir/ypg2rapsql.sh"
 

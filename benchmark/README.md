@@ -5,6 +5,7 @@
   - [System monitoring](#system-monitoring)
   - [Measurement Monitoring](#measurement-monitoring)
   - [Usage](#usage)
+    - [SPX2](#spx2)
 
 ## Prerequisites
 
@@ -39,3 +40,15 @@ watch -c "printf '\033[1;31m'; df -h | awk 'NR==1 || NR==4'; echo; printf '\033[
 |  250m |  sp250000000 |  docker exec rapsqldb-container mnt/rapsqlbench/benchmark/spx.sh 250000000 |  select drop_graph('sp250000000',true); |
 |  500m |  sp500000000 |  docker exec rapsqldb-container mnt/rapsqlbench/benchmark/spx.sh 500000000 |  select drop_graph('sp500000000',true); |
 |   1bn | sp1000000000 | docker exec rapsqldb-container mnt/rapsqlbench/benchmark/spx.sh 1000000000 | select drop_graph('sp1000000000',true); |
+
+### SPX2
+
+Uses no RDFSP, e.g., 10k dataset:
+
+```bash
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/spx2.sh 10000
+```
+
+```sql
+select drop_graph('sp10000',true);
+```
