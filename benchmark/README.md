@@ -52,3 +52,23 @@ docker exec rapsqldb-container mnt/rapsqlbench/benchmark/spx2.sh 10000
 ```sql
 select drop_graph('sp10000',true);
 ```
+
+```bash
+./rapsqlbench.sh -g sp125 -t 125 -m 25000 -c 8
+```
+
+```bash
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp1m -t 1000000 -m 25000 -c 8
+```
+
+```bash
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp100k -t 100000 -m 25000 -c 8
+```
+
+```bash
+sudo rm -rf /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/benchmark/data/sp*; sudo rm -rf /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/benchmark/measurement/sp*
+```
+
+```bash
+docker exec rapsqlcontainer /mnt/data/sp1m/rapsqlbench.sh -g sp1m -t 1000000 -m 250000 -c 32
+```

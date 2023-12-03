@@ -88,4 +88,5 @@ Please note that these steps assume you have the necessary permissions to perfor
     ```bash
     ansible-playbook -i ./inventory/vm1k-eip.txt ../ansible/deploy.yml -e "triples=1000"
     ansible-playbook -i ./inventory/vm10k-eip.txt ../ansible/deploy.yml -e "triples=10000"
+    ansible-playbook -i ./inventory/vm100k-eip.txt ../ansible/deploy.yml -e "triples=100000"
     ```
