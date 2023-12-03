@@ -76,7 +76,7 @@ partition_edges() {
     # Create a new CSV file with the word as the filename and add the first line
     echo "start_id,start_vertex_type,end_id,end_vertex_type,iri" > "$output_file"
     # Extract all lines from the raw file that end with the word and append them to the output file
-    grep ".*$url$" "$raw_file_path" >> "$output_file"
+    grep ".*$url$" "$raw_file_path" >> "$output_file" &
     # sed -n "/.*$url$/p" "$raw_file_path" >> "$output_file"
     # Append elabels stmt to sql file
     sql_create_elabel "$graph_name" "$word" "$sql_file"
