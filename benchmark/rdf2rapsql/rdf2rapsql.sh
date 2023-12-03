@@ -39,6 +39,7 @@ nlit_csv="$data_dir"/nlit.csv
 nbn_csv="$data_dir"/nbn.csv
 edtp_csv="$data_dir"/edtp.csv
 eop_csv="$data_dir"/eop.csv
+rapsql_txt="$measurement_dir"/rapsql.txt
 edtp_part_txt="$data_dir"/edtp_part.txt
 eop_part_txt="$data_dir"/eop_part.txt
 import_sql="$data_dir"/import.sql
@@ -79,6 +80,9 @@ $writesql_sh "$graphname" "$nres_csv" "$nlit_csv" "$nbn_csv" || exit 1
 import_dir="$data_dir"/"import"
 init_sql="$import_dir"/init.sql
 ensure_path "$init_sql"
+# Init rapsql graph using init.sql
+psql -q -U postgres -d rapsql -f "$init_sql" > "$rapsql_txt" || exit 1
+
 
 # Created node sql files
 nodes_dir="$import_dir"/nodes
@@ -107,10 +111,6 @@ eop_sql="$edges_dir"/eop.sql
 ensure_path "$edtp_sql"
 ensure_path "$eop_sql"
 
-# Init rapsql graph using init.sql
-rapsql_txt="$measurement_dir"/rapsql.txt
-# echo "CREATE GRAPH $graphname"
-psql -q -U postgres -d rapsql -f "$init_sql" > "$rapsql_txt" || exit 1
 
 # Import nodes in parallel
 # Input: import/{nres, nlit, nbn}.sql 
@@ -126,8 +126,6 @@ $exectime_sh "DBIMPORT-NODES" "$dbimport_nodes_start" "$dbimport_nodes_end"
 dbimport_edges_start=$(get_ts)
 echo "DBIMPORT-EDGES, START, $dbimport_edges_start"
 $sqlimport_sh "$edges_dir" "$rapsql_txt" || exit 1
-# $sqlimport_sh "$edtp_sql_dir" "$rapsql_txt" || exit 1
-# $sqlimport_sh "$eop_sql_dir" "$rapsql_txt" || exit 1
 dbimport_edges_end=$(get_ts)
 echo "DBIMPORT-EDGES, END, $dbimport_edges_end"
 $exectime_sh "DBIMPORT-EDGES" "$dbimport_edges_start" "$dbimport_edges_end"

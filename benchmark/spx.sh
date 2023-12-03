@@ -91,7 +91,7 @@ $exectime_sh "SP2B" "$sp2b_start" "$sp2b_end"
 rdf2rapsql_start=$(get_ts)
 echo_tee "RDF2RAPSQL, START, $rdf2rapsql_start"
 # Run rdf2rapsql
-rdf2rapsql=$(realpath "$cwd/rdf2rapsql/rdf2rapsql3.sh")
+rdf2rapsql=$(realpath "$cwd/rdf2rapsql/rdf2rapsql.sh")
 "$rdf2rapsql" "$graphname" "$memory" "$cores" | tee -a "$measurement_file" || exit 1
 rdf2rapsql_end=$(get_ts)
 echo_tee "RDF2RAPSQL, END, $rdf2rapsql_end"
