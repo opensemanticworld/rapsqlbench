@@ -29,30 +29,30 @@
   become: yes
   become_user: root
   tasks:
-    - name: Create an ext4 filesystem on /dev/xvdh
-      community.general.filesystem:
-        fstype: ext4
-        state: present
-        dev: /dev/xvdh
+    # - name: Create an ext4 filesystem on /dev/nvme1n1
+    #   community.general.filesystem:
+    #     fstype: ext4
+    #     state: present
+    #     dev: /dev/nvme1n1
 
-    - name: Fetch the UUID of /dev/xvdh
-      command: blkid -s UUID -o value /dev/xvdh
-      changed_when: false
-      register: blkid_out
+    # - name: Fetch the UUID of /dev/nvme1n1
+    #   command: blkid -s UUID -o value /dev/nvme1n1
+    #   changed_when: false
+    #   register: blkid_out
 
-    - name: Mount /dev/xvdh by UUID
-      ansible.posix.mount:
-        path: /mnt
-        src: UUID={{ blkid_out.stdout }}
-        fstype: ext4
-        opts: defaults
-        state: mounted
+    # - name: Mount /dev/nvme1n1 by UUID
+    #   ansible.posix.mount:
+    #     path: /mnt
+    #     src: UUID={{ blkid_out.stdout }}
+    #     fstype: ext4
+    #     opts: defaults
+    #     state: mounted
 
-    - name: Resize disk of /dev/xvdh
-      filesystem:
-        fstype: ext4
-        dev: /dev/xvdh
-        resizefs: yes
+    # - name: Resize disk of /dev/nvme1n1
+    #   filesystem:
+    #     fstype: ext4
+    #     dev: /dev/nvme1n1
+    #     resizefs: yes
 
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
@@ -105,54 +105,54 @@
         groups: docker
       tags: docker
 
-# Begin: Change Docker Storage Location
-- hosts: all
-  user: ubuntu
-  become: yes
-  become_user: root
-  tasks:
-    # check if the new docker storage location exists
-    - name: Check if desired docker storage location exists
-      ansible.builtin.stat:
-        path: /mnt/docker/
-      register: dir_check
-      tags: docker
+# # Begin: Change Docker Storage Location
+# - hosts: all
+#   user: ubuntu
+#   become: yes
+#   become_user: root
+#   tasks:
+#     # check if the new docker storage location exists
+#     - name: Check if desired docker storage location exists
+#       ansible.builtin.stat:
+#         path: /mnt/docker/
+#       register: dir_check
+#       tags: docker
 
-    - name: Create docker storage location if not exists
-      ansible.builtin.file:
-        path: /mnt/docker
-        state: directory
-      tags: docker
-        # mode: '0755'
+#     - name: Create docker storage location if not exists
+#       ansible.builtin.file:
+#         path: /mnt/docker
+#         state: directory
+#       tags: docker
+#         # mode: '0755'
 
-    - name: Stop docker service
-      ansible.builtin.systemd:
-        state: stopped
-        name: docker
-      tags: docker
-      when: not dir_check.stat.exists
+#     - name: Stop docker service
+#       ansible.builtin.systemd:
+#         state: stopped
+#         name: docker
+#       tags: docker
+#       when: not dir_check.stat.exists
 
-    - name: Copy docker data to new location
-      ansible.builtin.shell: rsync -aP /var/lib/docker/ /mnt/docker
-      tags: docker
-      when: not dir_check.stat.exists
+#     - name: Copy docker data to new location
+#       ansible.builtin.shell: rsync -aP /var/lib/docker/ /mnt/docker
+#       tags: docker
+#       when: not dir_check.stat.exists
 
-    - name: Change docker storage location
-      ansible.builtin.lineinfile:
-        path: /lib/systemd/system/docker.service
-        regexp: '^ExecStart='
-        line: ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --data-root /mnt/docker
-      tags: docker
-      when: not dir_check.stat.exists
+#     - name: Change docker storage location
+#       ansible.builtin.lineinfile:
+#         path: /lib/systemd/system/docker.service
+#         regexp: '^ExecStart='
+#         line: ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --data-root /mnt/docker
+#       tags: docker
+#       when: not dir_check.stat.exists
 
-    - name: Start docker with reloaded daemon
-      ansible.builtin.systemd:
-        daemon_reload: true
-        state: started
-        name: docker
-      tags: docker
-      when: not dir_check.stat.exists
-# End: Change Docker Storage Location
+#     - name: Start docker with reloaded daemon
+#       ansible.builtin.systemd:
+#         daemon_reload: true
+#         state: started
+#         name: docker
+#       tags: docker
+#       when: not dir_check.stat.exists
+# # End: Change Docker Storage Location
 
 
 # Start: Perform rapsql benchmark
@@ -173,41 +173,41 @@
     #   ansible.builtin.debug:
     #     var: rapsqldb
     
-    - name: Verify rapsqldb is running
-      ansible.builtin.assert:
-        that: 
-          - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
+#     - name: Verify rapsqldb is running
+#       ansible.builtin.assert:
+#         that: 
+#           - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
 
-    - name: Perform rapsql benchmark by input triple value
-      community.docker.docker_container_exec:
-        container: rapsqlcontainer
-        command: /bin/bash spx.sh {{ triples }}
-        chdir: /mnt
-      register: rapsqlbench
+    # - name: Perform rapsql benchmark by input triple value
+    #   community.docker.docker_container_exec:
+    #     container: rapsqlcontainer
+    #     command: /bin/bash spx2.sh {{ triples }}
+    #     chdir: /mnt
+    #   register: rapsqlbench
       
-    - name: Show rapsqlbench results
-      ansible.builtin.debug:
-        var: rapsqlbench
+    # - name: Show rapsqlbench results
+    #   ansible.builtin.debug:
+    #     var: rapsqlbench
 # End: Perform rapsql benchmark
 
 
-# Start: Fetch Results
-- hosts: all
-  user: ubuntu
-  become: yes
-  become_user: root
-  tasks:
-    - name: Synchronize measurement from remote
-      ansible.posix.synchronize:
-        src: /mnt/benchmark/measurement/
-        dest: ../results/aws/measurement
-        mode: pull
-        delete: no
+# # Start: Fetch Results
+# - hosts: all
+#   user: ubuntu
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Synchronize measurement from remote
+#       ansible.posix.synchronize:
+#         src: /mnt/benchmark/measurement/
+#         dest: ../results/aws/measurement
+#         mode: pull
+#         delete: no
 
-    - name: Synchronize data from remote
-      ansible.posix.synchronize:
-        src: /mnt/benchmark/data/
-        dest: ../results/aws/data
-        mode: pull
-        delete: no
-# End: Fetch Results
+#     - name: Synchronize data from remote
+#       ansible.posix.synchronize:
+#         src: /mnt/benchmark/data/
+#         dest: ../results/aws/data
+#         mode: pull
+#         delete: no
+# # End: Fetch Results

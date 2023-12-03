@@ -109,6 +109,12 @@ resource "aws_instance" "tf-aws-ubuntu-instance" {
   vpc_security_group_ids = [aws_security_group.tf-aws-sg.id]
   subnet_id              = aws_subnet.tf-aws-subnet.id
   depends_on             = [aws_internet_gateway.tf-aws-gw]
+  root_block_device {
+    volume_size = each.value.ebs_size
+    volume_type = var.ebs_type
+    iops        = var.ebs_iops
+    throughput  = var.ebs_throughput
+  }
   tags = {
     Name = var.env_tag
   }
@@ -134,25 +140,25 @@ resource "local_file" "tf-aws-eip-loc" {
   filename = "${path.module}/inventory/${each.key}-eip.txt"
 }
 
-# Create an EBS volume mapping 
-resource "aws_ebs_volume" "tf-aws-ebs" {
-  for_each = var.vm_map
+# # Create an EBS volume mapping 
+# resource "aws_ebs_volume" "tf-aws-ebs" {
+#   for_each = var.vm_map
 
-  availability_zone = var.aws_availability_zone
-  size              = each.value.ebs_size
-  type              = "gp3"
-  iops              = 3000
-  throughput        = 125 #MiB/s
-  tags = {
-    Name = var.env_tag
-  }
-}
+#   availability_zone = var.aws_availability_zone
+#   size              = each.value.ebs_size
+#   type              = "gp3"
+#   iops              = 3000
+#   throughput        = 125 #MiB/s
+#   tags = {
+#     Name = var.env_tag
+#   }
+# }
 
-# Attach the EBS volume to the mapped instances
-resource "aws_volume_attachment" "tf-aws-ebs" {
-  for_each = var.vm_map
+# # Attach the EBS volume to the mapped instances
+# resource "aws_volume_attachment" "tf-aws-ebs" {
+#   for_each = var.vm_map
 
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.tf-aws-ebs[each.key].id
-  instance_id = aws_instance.tf-aws-ubuntu-instance[each.key].id
-}
+#   device_name = "/dev/sdh"
+#   volume_id   = aws_ebs_volume.tf-aws-ebs[each.key].id
+#   instance_id = aws_instance.tf-aws-ubuntu-instance[each.key].id
+# }

@@ -27,6 +27,24 @@ variable "ssh_key_name" {
   default = "radearan-sysarch-rsa" # Change this to your ssh key name
 }
 
+# EBS Volume Type
+variable "ebs_type" {
+  type    = string
+  default = "gp3"
+}
+
+# EBS Volume IOPS
+variable "ebs_iops" {
+  type    = number
+  default = 3000
+}
+
+# EBS Volume Throughput
+variable "ebs_throughput" {
+  type    = number
+  default = 125
+}
+
 # Unique VM resource mapping including public IP, local IP file, and EBS
 variable "vm_map" {
   type = map(object({
@@ -35,16 +53,38 @@ variable "vm_map" {
     ebs_size      = number
   }))
   default = {
-    "vm1k" = {
+    # TODO: SET RIGHT AMI AND EBS SIZE
+    # "vmtest" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "t2.micro"
+    #   ebs_size      = 30
+    # }
+    # "vm100k" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 30
+    # }
+    "vm125m" = {
       ami           = "ami-04e601abe3e1a910f"
-      instance_type = "t2.micro"
-      ebs_size      = 8
+      instance_type = "r5.8xlarge"
+      ebs_size      = 500
     }
-    ## Example for multiple VMs
-    "vm10k" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "t2.micro"
-      ebs_size      = 8
-    }
+    # "vm250m" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 500
+    # }
+    # "vm500m" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 1000
+    # }
+    # "vm1bn" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 2000
+    # }
   }
 }
+
+
