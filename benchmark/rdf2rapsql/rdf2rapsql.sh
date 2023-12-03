@@ -102,10 +102,12 @@ $exectime_sh "EDGEPARTITIONING" "$edgepart_start" "$edgepart_end"
 
 # Created edge sql files
 edges_dir="$import_dir"/edges
-edtp_sql="$edges_dir"/edtp.sql
-eop_sql="$edges_dir"/eop.sql
-ensure_path "$edtp_sql"
-ensure_path "$eop_sql"
+edtp_dir="$edges_dir"/edtp
+eop_dir="$edges_dir"/eop
+# edtp_sql="$edges_dir"/edtp.sql
+# eop_sql="$edges_dir"/eop.sql
+# ensure_path "$edtp_sql"
+# ensure_path "$eop_sql"
 
 # Init rapsql graph using init.sql
 rapsql_txt="$measurement_dir"/rapsql.txt
@@ -125,9 +127,8 @@ $exectime_sh "DBIMPORT-NODES" "$dbimport_nodes_start" "$dbimport_nodes_end"
 # Input: {edtp, eop}/import/*.sql
 dbimport_edges_start=$(get_ts)
 echo "DBIMPORT-EDGES, START, $dbimport_edges_start"
-$sqlimport_sh "$edges_dir" "$rapsql_txt" || exit 1
-# $sqlimport_sh "$edtp_sql_dir" "$rapsql_txt" || exit 1
-# $sqlimport_sh "$eop_sql_dir" "$rapsql_txt" || exit 1
+$sqlimport_sh "$edtp_dir" "$rapsql_txt" || exit 1
+$sqlimport_sh "$eop_dir" "$rapsql_txt" || exit 1
 dbimport_edges_end=$(get_ts)
 echo "DBIMPORT-EDGES, END, $dbimport_edges_end"
 $exectime_sh "DBIMPORT-EDGES" "$dbimport_edges_start" "$dbimport_edges_end"

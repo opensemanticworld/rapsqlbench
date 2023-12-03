@@ -9,8 +9,10 @@ file_name=$(basename "$raw_file_path" .csv)
 raw_file_dir=$(dirname "$raw_file_path")
 part_dir="$raw_file_dir"/"$file_name"
 # sql_dir="$part_dir"/import
-sql_dir="$raw_file_dir"/import/edges
+# mkdir -p "$sql_dir"
+sql_dir="$raw_file_dir"/import/edges/"$file_name"
 mkdir -p "$sql_dir" "$part_dir"
+
 
 # Create initial sql file
 sql_create_basefile() {
@@ -55,11 +57,6 @@ SELECT load_edges_from_file(
 SELECT now() AS \"END DBIMPORT $elabel\";" >> "$sql_file"
 }
 
-# single sql file
-output_sql="${sql_dir}/${file_name}.sql"
-sql_create_basefile "$output_sql" "$file_name"
-
-
 # Read the lines from the text file
 while IFS= read -r line; do
   # Execution for each line in parallel
@@ -69,11 +66,13 @@ while IFS= read -r line; do
     keyword=$(echo "$line" | grep -oE '[^/#]+$')
     # echo "keyword: $keyword"
     output_csv="${part_dir}/${keyword}.csv"
+    output_sql="${sql_dir}/${keyword}.sql"
 
     # echo "output_csv: $output_csv"
     echo "start_id,start_vertex_type,end_id,end_vertex_type,iri" > "$output_csv"
     grep ".*$line$" "$raw_file_path" >> "$output_csv"
     # create sql file per edge label
+    sql_create_basefile "$output_sql" "$keyword"
     sql_create_elabel "$output_sql" "$graph_name" "$keyword"
     sql_load_edges_from_file "$output_sql" "$graph_name" "$keyword" "$output_csv"
   } &
@@ -81,30 +80,3 @@ done < "$raw_part_file_path"
 
 # Wait for all background processes to finish
 wait
-
-
-# multiple sql files
-
-# # Read the lines from the text file
-# while IFS= read -r line; do
-#   # Execution for each line in parallel
-#   {
-#     # Place your command or script here
-#     # echo "Processing $line"
-#     keyword=$(echo "$line" | grep -oE '[^/#]+$')
-#     # echo "keyword: $keyword"
-#     output_csv="${part_dir}/${keyword}.csv"
-#     output_sql="${sql_dir}/${keyword}.sql"
-
-#     # echo "output_csv: $output_csv"
-#     echo "start_id,start_vertex_type,end_id,end_vertex_type,iri" > "$output_csv"
-#     grep ".*$line$" "$raw_file_path" >> "$output_csv"
-#     # create sql file per edge label
-#     sql_create_basefile "$output_sql" "$keyword"
-#     sql_create_elabel "$output_sql" "$graph_name" "$keyword"
-#     sql_load_edges_from_file "$output_sql" "$graph_name" "$keyword" "$output_csv"
-#   } &
-# done < "$raw_part_file_path"
-
-# # Wait for all background processes to finish
-# wait
