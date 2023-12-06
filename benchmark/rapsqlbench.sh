@@ -140,6 +140,6 @@ check_memory_resources "$mem"
 ##########################################################
 real_path=$(realpath "$0")
 basedir=$(dirname "$real_path")
-spx_sh=$basedir/spx4.sh
+spx_sh=$basedir/spx.sh
 "$spx_sh" "$graphname" "$triples" "$mem" "$cores" || exit 1
 
