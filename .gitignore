@@ -17,7 +17,9 @@ ansible/*.yml
 ansible/POSTGRES.md
 ansible/PERFORMANCE.md
 !ansible/deploy.yml
-benchmark/queries/*
 rapsql-docker/*
 !rapsql-docker/docker-compose.yml
 !rapsql-docker/.env
+benchmark/queries/test/*
+benchmark/queries/*.jar
+benchmark/queries/cypher/sp*
