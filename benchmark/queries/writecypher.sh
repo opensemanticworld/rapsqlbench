@@ -3,8 +3,8 @@
 graph_name=$1
 
 # rapsqltranspiler version
-version="v0.1.2-L2L-L2R"
-# version="v0.1.3-L2L"
+# version="v0.1.2-L2L-L2R"
+version="v0.1.3-L2L"
 
 # Paths
 dir_path=$(dirname "$(realpath "$0")")
