@@ -2,13 +2,17 @@
 
 graph_name=$1
 
+# rapsqltranspiler version
+version="v0.1.2-L2L-L2R"
+# version="v0.1.3-L2L"
+
 # Paths
 dir_path=$(dirname "$(realpath "$0")")
 sparql_dir="$dir_path/sparql"
-cypher_dir="$dir_path/cypher/$graph_name"
+cypher_dir="$dir_path/cypher/$version/$graph_name"
 q6provider_sh="$dir_path/q6provider.sh"
 q7provider_sh="$dir_path/q7provider.sh"
-rapsqltranspiler_jar="$dir_path/rapsqltranspiler-v0.1.0.jar"
+rapsqltranspiler_jar="$dir_path/rapsqltranspiler-$version.jar"
 
 # Target directory
 mkdir -p "$cypher_dir"
@@ -41,7 +45,7 @@ transpiler_s2c() {
   local graph_name="$2"
   local file_path="$3"
   sql_create_basefile "$file_path"
-  java -jar "$rapsqltranspiler_jar" "$sparql_file" "$graph_name" >> "$file_path" || exit 1
+  java -jar "$rapsqltranspiler_jar" "$graph_name" "$sparql_file" >> "$file_path" || exit 1
 }
 
 # Transform all sparql queries to cypher queries
