@@ -28,7 +28,7 @@ penalize_tout_query() {
     # if [[ $last_line == *timeout* ]]; then
     if grep -q "statement timeout" "$file"; then
       # query name is the filename
-      penalty="3600000.000 ms"
+      local penalty="3600000.000 ms"
       query=$(basename "$file" .txt).sql
       echo "QUERY-TOUT | loop-$loop_cnt | $query, PENALTY, $penalty"
       # make timeout dir in cypher_dir
@@ -56,7 +56,7 @@ create_penalty_responses() {
   local penalty_file="$1"
   local loop_cnt="$2"
   local response_loop_dir="$3"
-
+  local penalty="3600000.000 ms"
   # if found .txt inside of penalty file, then iterate over each line in penalty file and print the filename 
   while IFS= read -r line; do
     file_basename="$(basename "$line" .txt)"
@@ -64,8 +64,8 @@ create_penalty_responses() {
     # create a text file with the query name in the response directory
     timeout_penalty_file="$response_loop_dir/$file_basename-skip.txt"
     # echo timeout_penalty_file: "$timeout_penalty_file"
-    echo -e "\ntimeout query\npenalty\nTime: 3600.000 ms" > "$timeout_penalty_file"
-    echo "QUERY-SKIP | loop-$loop_cnt | $file_basename, PENALTY, 3600.000 ms"
+    echo -e "\ntimeout query\npenalty\nTime: $penalty" > "$timeout_penalty_file"
+    echo "QUERY-SKIP | loop-$loop_cnt | $file_basename, PENALTY, $penalty"
   done < "$penalty_file"
 }
 
