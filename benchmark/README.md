@@ -7,6 +7,7 @@
   - [Usage](#usage)
     - [SPX2](#spx2)
   - [Postgres](#postgres)
+  - [Monitor](#monitor)
 
 ## Prerequisites
 
@@ -96,4 +97,12 @@ Refresh the configuration:
 
 ```bash
 docker exec rapsqldb-container psql -U postgres -d rapsql -c "SELECT pg_reload_conf();"
+```
+
+## Monitor
+
+Track complete csv file:
+
+```bash
+tail -f -n +1 measurement.csv
 ```

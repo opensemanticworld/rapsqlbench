@@ -30,6 +30,8 @@ services:
       - "effective_cache_size=192GB"
       # - "-c"
       # - "max_parallel_workers_per_gather=6"
+      - "-c"
+      - "statement_timeout=30min"
     deploy:
       resources:
         limits:

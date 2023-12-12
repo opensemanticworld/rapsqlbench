@@ -173,21 +173,28 @@
     #   ansible.builtin.debug:
     #     var: rapsqldb
     
-#     - name: Verify rapsqldb is running
-#       ansible.builtin.assert:
-#         that: 
-#           - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
+    - name: Verify rapsqldb is running
+      ansible.builtin.assert:
+        that: 
+          - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
 
-    # - name: Perform rapsql benchmark by input triple value
-    #   community.docker.docker_container_exec:
-    #     container: rapsqlcontainer
-    #     command: /bin/bash spx2.sh {{ triples }}
-    #     chdir: /mnt
-    #   register: rapsqlbench
+    - name: Perform rapsql benchmark by input triple value
+      community.docker.docker_container_exec:
+        container: rapsqlcontainer
+        command: /bin/bash rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m 250000 -c 32
+        chdir: /mnt
+      register: rapsqlbench
       
-    # - name: Show rapsqlbench results
-    #   ansible.builtin.debug:
-    #     var: rapsqlbench
+    - name: Show rapsqlbench results
+      ansible.builtin.debug:
+        var: rapsqlbench
+
+    - name: Synchronize data from remote
+      ansible.posix.synchronize:
+        src: /mnt/benchmark/data/
+        dest: ../results/aws/data
+        mode: pull
+        delete: no
 # End: Perform rapsql benchmark
 
 
@@ -197,17 +204,12 @@
 #   become: yes
 #   become_user: root
 #   tasks:
+
+
 #     - name: Synchronize measurement from remote
 #       ansible.posix.synchronize:
 #         src: /mnt/benchmark/measurement/
 #         dest: ../results/aws/measurement
-#         mode: pull
-#         delete: no
-
-#     - name: Synchronize data from remote
-#       ansible.posix.synchronize:
-#         src: /mnt/benchmark/data/
-#         dest: ../results/aws/data
 #         mode: pull
 #         delete: no
 # # End: Fetch Results
