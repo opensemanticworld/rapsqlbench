@@ -58,47 +58,47 @@ echo_tee "MEASUREMENT, PID, $$"
 
 
 
-# ### SP2B START ###
-# # Generate "-t X" rdf triples 
-# # Output: spX.n3
-# sp2b=$cwd/sp2b/bin
-# sp2b_txt=$cwd/measurement/"$graphname"/sp2b.txt
-# sp2b_start=$(get_ts)
-# echo_tee "SP2B, START, $sp2b_start"
-# echo_tee "SP2B, DIR, $sp2b"
+### SP2B START ###
+# Generate "-t X" rdf triples 
+# Output: spX.n3
+sp2b=$cwd/sp2b/bin
+sp2b_txt=$cwd/measurement/"$graphname"/sp2b.txt
+sp2b_start=$(get_ts)
+echo_tee "SP2B, START, $sp2b_start"
+echo_tee "SP2B, DIR, $sp2b"
 
-# # Change to sp2b dir
-# cd "$sp2b" || exit
-# # Run sp2b
-# ./sp2b_gen -t "$triples" > "$sp2b_txt" || exit 1
-# # Change back to cwd
-# cd "$cwd" || exit
-# # Move sp2b data to data dir
-# mv "$sp2b"/sp2b.n3 "$data_dir"/"$graphname".n3
-# # Read real triple count and file size from sp2b.txt tail
-# sp2b_triples=$(grep -o 'total triples=[0-9]*$' "$sp2b_txt" | tail -n 1 | cut -d '=' -f 2)
-# sp2b_filesize=$(grep -o 'total file size=[0-9]*KB$' "$sp2b_txt"| tail -n 1 | cut -d '=' -f 2)
-# # Output sp2b results
-# sp2b_end=$(get_ts)
-# echo_tee "SP2B, TRIPLES, $sp2b_triples"
-# echo_tee "SP2B, FILESIZE, $sp2b_filesize"
-# echo_tee "SP2B, END, $sp2b_end"
-# $exectime_sh "SP2B" "$sp2b_start" "$sp2b_end"
-# ### SP2B END ###
+# Change to sp2b dir
+cd "$sp2b" || exit
+# Run sp2b
+./sp2b_gen -t "$triples" > "$sp2b_txt" || exit 1
+# Change back to cwd
+cd "$cwd" || exit
+# Move sp2b data to data dir
+mv "$sp2b"/sp2b.n3 "$data_dir"/"$graphname".n3
+# Read real triple count and file size from sp2b.txt tail
+sp2b_triples=$(grep -o 'total triples=[0-9]*$' "$sp2b_txt" | tail -n 1 | cut -d '=' -f 2)
+sp2b_filesize=$(grep -o 'total file size=[0-9]*KB$' "$sp2b_txt"| tail -n 1 | cut -d '=' -f 2)
+# Output sp2b results
+sp2b_end=$(get_ts)
+echo_tee "SP2B, TRIPLES, $sp2b_triples"
+echo_tee "SP2B, FILESIZE, $sp2b_filesize"
+echo_tee "SP2B, END, $sp2b_end"
+$exectime_sh "SP2B" "$sp2b_start" "$sp2b_end"
+### SP2B END ###
 
 
-# ### RDF2RAPSQL START ###
-# # Input: spX.n3
-# # Target: rapsql database
-# rdf2rapsql_start=$(get_ts)
-# echo_tee "RDF2RAPSQL, START, $rdf2rapsql_start"
-# # Run rdf2rapsql
-# rdf2rapsql_sh=$(realpath "$cwd/rdf2rapsql/rdf2rapsql.sh")
-# "$rdf2rapsql_sh" "$graphname" "$memory" "$cores" | tee -a "$measurement_file" || exit 1
-# rdf2rapsql_end=$(get_ts)
-# echo_tee "RDF2RAPSQL, END, $rdf2rapsql_end"
-# echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
-# ### RDF2RAPSQL END ###
+### RDF2RAPSQL START ###
+# Input: spX.n3
+# Target: rapsql database
+rdf2rapsql_start=$(get_ts)
+echo_tee "RDF2RAPSQL, START, $rdf2rapsql_start"
+# Run rdf2rapsql
+rdf2rapsql_sh=$(realpath "$cwd/rdf2rapsql/rdf2rapsql.sh")
+"$rdf2rapsql_sh" "$graphname" "$memory" "$cores" | tee -a "$measurement_file" || exit 1
+rdf2rapsql_end=$(get_ts)
+echo_tee "RDF2RAPSQL, END, $rdf2rapsql_end"
+echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
+### RDF2RAPSQL END ###
 
 
 ### WRITECYPHER START ###
