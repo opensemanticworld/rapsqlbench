@@ -1,15 +1,17 @@
 #!/bin/bash
 
 graph_name=$1
+query_dir=$2
 
 # rapsqltranspiler version
 # version="v0.1.2-L2L-L2R"
 version="v0.1.3-L2L"
 
 # Paths
+sparql_dir="$query_dir/sparql"
+cypher_dir="$query_dir/cypher/$graph_name"
+# cypher_dir="$query_dir/cypher/$version/$graph_name"
 dir_path=$(dirname "$(realpath "$0")")
-sparql_dir="$dir_path/sparql"
-cypher_dir="$dir_path/cypher/$version/$graph_name"
 q6provider_sh="$dir_path/q6provider.sh"
 q7provider_sh="$dir_path/q7provider.sh"
 rapsqltranspiler_jar="$dir_path/rapsqltranspiler-$version.jar"
@@ -22,11 +24,12 @@ sql_create_basefile() {
   local sql_file="$1"
   keyword="$(basename "$sql_file" .sql)"
   # Create base file
-  echo "-- cypher/$keyword.sql
+  echo -E "-- cypher/$keyword.sql
 
 -- age config
 LOAD 'age';
 SET search_path TO ag_catalog;
+\timing
 " > "$sql_file"
 }
 

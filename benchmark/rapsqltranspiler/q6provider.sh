@@ -7,6 +7,7 @@ q6="-- cypher/i9-q6.sql !MANUALLY CREATED
 -- age config
 LOAD 'age';
 SET search_path TO ag_catalog;
+\timing
 
 SELECT yr, name, document FROM ag_catalog.cypher('$graph_name', \$\$
 MATCH (class)-[:subClassOf {iri:'http://www.w3.org/2000/01/rdf-schema#subClassOf'}]->({iri:'http://xmlns.com/foaf/0.1/Document'})

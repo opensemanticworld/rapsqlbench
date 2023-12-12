@@ -6,6 +6,7 @@
   - [Measurement Monitoring](#measurement-monitoring)
   - [Usage](#usage)
     - [SPX2](#spx2)
+  - [Postgres](#postgres)
 
 ## Prerequisites
 
@@ -66,9 +67,33 @@ docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp100
 ```
 
 ```bash
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp100 -t 100 -m 25000 -c 8
+```
+
+```bash
 sudo rm -rf /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/benchmark/data/sp*; sudo rm -rf /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/benchmark/measurement/sp*
 ```
 
 ```bash
 docker exec rapsqlcontainer /mnt/data/sp1m/rapsqlbench.sh -g sp1m -t 1000000 -m 250000 -c 32
+```
+
+## Postgres
+
+Set `timeout` to 10 seconds:
+
+```bash
+docker exec rapsqldb-container psql -U postgres -d rapsql -c "ALTER SYSTEM SET statement_timeout = '5min';"
+```
+
+Set execution time information:
+
+```bash
+docker exec rapsqldb-container psql -U postgres -d rapsql -c "ALTER SYSTEM SET log_duration = on;"
+```
+
+Refresh the configuration:
+
+```bash
+docker exec rapsqldb-container psql -U postgres -d rapsql -c "SELECT pg_reload_conf();"
 ```
