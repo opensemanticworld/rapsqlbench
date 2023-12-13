@@ -1,5 +1,8 @@
 _old/
-results/*
+# results/*
+results/import
+results/paper
+results/aws/*
 benchmark/sp2b/src/*
 benchmark/data/
 benchmark/measurement/
