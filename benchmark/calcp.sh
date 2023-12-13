@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Config
+# Input Paths
 cypher_dir=$1
 measurement_dir=$2
 
+# Config Paths
 responses_dir=$cypher_dir/responses
 exectimes_csv=$measurement_dir/exectimes.csv
 performance_csv=$measurement_dir/performance.csv
@@ -40,7 +41,6 @@ function geometric_mean {
   echo "$geometric_mean" >> "$output_csv"
 }
 
-
 # calculate performance metrics
 function calc_metrics {
   # read all comma seperated values from a csv file, then calculate the arithmetic and geometric mean for each row value
@@ -48,12 +48,17 @@ function calc_metrics {
   local output_csv=$2
   # read each row of the input csv file except the header
   while IFS= read -r line; do
+    # calculate the arithmetic mean, append to csv file
     arithmetic_mean "$line" "$output_csv"
+    # append a comma to the same line in output csv file
     echo -n "," >> "$output_csv"
+    # calculate the arithmetic mean, append to csv file
     geometric_mean "$line" "$output_csv"
   done < <(tail -n +2 "$input_csv")
 }
 
+
+### RESULTS ###
 
 # exectimes.csv header
 echo "q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c" > "$exectimes_csv"
