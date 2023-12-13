@@ -6,6 +6,9 @@
   - [2. Configuration](#2-configuration)
   - [3. Implementation](#3-implementation)
   - [2. Usage](#2-usage)
+  - [Perform a benchmark](#perform-a-benchmark)
+    - [Start the benchmark](#start-the-benchmark)
+    - [Monitor measurment files](#monitor-measurment-files)
 
 ## Prerequisites
 
@@ -90,3 +93,27 @@ Please note that these steps assume you have the necessary permissions to perfor
     ansible-playbook -i ./inventory/vm10k-eip.txt ../ansible/deploy.yml -e "triples=10000"
     ansible-playbook -i ./inventory/vm100k-eip.txt ../ansible/deploy.yml -e "triples=100000"
     ```
+
+## Perform a benchmark
+
+### Start the benchmark
+
+```bash
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "graphname=sp1m triples=1000000"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "graphname=sp125m triples=125000000"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "graphname=sp250m triples=250000000"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "graphname=sp500m triples=500000000"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "graphname=sp1bil triples=1000000000"
+```
+
+### Monitor measurment files
+
+To monitor the measurement files, you can use the following command:
+
+```bash
+tail -f -n +1 /mnt/benchmark/measurement/sp1m/measurement.csv
+tail -f -n +1 /mnt/benchmark/measurement/sp125m/measurement.csv
+tail -f -n +1 /mnt/benchmark/measurement/sp250m/measurement.csv
+tail -f -n +1 /mnt/benchmark/measurement/sp500m/measurement.csv
+tail -f -n +1 /mnt/benchmark/measurement/sp1bil/measurement.csv
+```

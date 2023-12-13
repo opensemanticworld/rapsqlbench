@@ -178,38 +178,53 @@
         that: 
           - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
 
-    - name: Perform rapsql benchmark by input triple value
-      community.docker.docker_container_exec:
-        container: rapsqlcontainer
-        command: /bin/bash rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m 250000 -c 32
-        chdir: /mnt
-      register: rapsqlbench
-      
-    - name: Show rapsqlbench results
-      ansible.builtin.debug:
-        var: rapsqlbench
+    # - name: Wait for rapsqldb to be ready
+    #   community.general.wait_for:
+    #     host: localhost
+    #     port: 5432
+    #     delay: 30
+    #     timeout: 100
+    #     state: started
 
-    - name: Synchronize data from remote
-      ansible.posix.synchronize:
-        src: /mnt/benchmark/data/
-        dest: ../results/aws/data
-        mode: pull
-        delete: no
+    # - name: Perform rapsql benchmark by input triple value
+    #   community.docker.docker_container_exec:
+    #     container: rapsqlcontainer
+    #     command: /bin/bash rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m 250000 -c 32
+    #     chdir: /mnt
+    #   register: rapsqlbench
+      
+    # - name: Show rapsqlbench results
+    #   ansible.builtin.debug:
+    #     var: rapsqlbench
+
+
 # End: Perform rapsql benchmark
 
 
-# # Start: Fetch Results
-# - hosts: all
-#   user: ubuntu
-#   become: yes
-#   become_user: root
-#   tasks:
+# Start: Fetch Results
+- hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: Synchronize measurement from remote
+      ansible.posix.synchronize:
+        src: /mnt/benchmark/measurement/
+        dest: ../results/aws/measurement
+        mode: pull
+        delete: no
 
-
-#     - name: Synchronize measurement from remote
-#       ansible.posix.synchronize:
-#         src: /mnt/benchmark/measurement/
-#         dest: ../results/aws/measurement
-#         mode: pull
-#         delete: no
-# # End: Fetch Results
+    - name: Synchronize queries from remote
+      ansible.posix.synchronize:
+        src: /mnt/benchmark/queries/cypher/
+        dest: ../results/aws/queries
+        mode: pull
+        delete: no
+    
+    # - name: Synchronize data from remote
+    #   ansible.posix.synchronize:
+    #     src: /mnt/benchmark/data/
+    #     dest: ../results/aws/data
+    #     mode: pull
+    #     delete: no    
+# End: Fetch Results

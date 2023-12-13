@@ -119,3 +119,6 @@ done
 #     $exectime_sh "$cypher_file_name" "$start_ts" "$end_ts" 
 #   done
 # done
+
+# prevent EOF error
+exit 0
