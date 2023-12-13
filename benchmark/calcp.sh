@@ -8,33 +8,13 @@ responses_dir=$cypher_dir/responses
 exectimes_csv=$measurement_dir/exectimes.csv
 performance_csv=$measurement_dir/performance.csv
 
-
-# echo the execution time of a .txt file
-# .responses (input_dir) -> subfolders:
-#  - loop1/*.txt
-#  - loop2/*.txt
-#  - loop3/*.txt
-#  - loop4/*.txt
-#  - loop5/*.txt
-#  - loop6/*.txt
-#  - loop7/*.txt
-#  - loop8/*.txt
-#  - loop9/*.txt
-#  - loop10/*.txt
-
-
-
 # use input_dir as parameter that has subfolders with .txt files to extract all execution times
 function execution_times {
     local input_dir=$1
     local csv_file=$2
     for dir in "$input_dir"/*; do
       # extract the exec times of each txt file in the subfolders and append them to a file
-      # in an ordered way, the first .txt of each subfolder, then the second .txt of each subfolder, etc.
-      # tail -n1 "$dir"/*.txt | sed -n 's/.*Time: \([0-9.]*\) ms.*/\1/p' | paste -s -d, >> "$csv_file"
-      # the same but cut all values after the decimal point
-      # tail -n1 "$dir"/*.txt | sed -n 's/.*Time: \([0-9]*\).*/\1/p' | paste -s -d, >> "$csv_file"
-      # the same but divide by 1000 to get the time in seconds
+      # the values are cut of nanoseconds and are divided by 1000 to get the time in seconds
       tail -n1 "$dir"/*.txt | sed -n 's/.*Time: \([0-9]*\).*/\1/p' | awk '{print $1/1000}' | paste -s -d, >> "$csv_file"
     done
 }
@@ -85,35 +65,3 @@ echo "arithmetic_mean,geometric_mean" > "$performance_csv"
 # call performance metrics for each query
 calc_metrics "$exectimes_csv" "$performance_csv"
 
-
-
-
-
-# # extract value between "Time: " and " ms"
-# # and save the result in a file called "execution_time.txt"
-# #using tail + sed
-# tail -n1 /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/results/aws/v1/queries/sp125m/responses/loop-1/*.txt | sed -n 's/.*Time: \([0-9.]*\) ms.*/\1/p' > execution_time.txt
-
-
-# # extract value between "Time: " and " ms"
-# # and save the result in a file called "execution_time.txt"
-# #using tail + awk
-# tail -n1 /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/results/aws/v1/queries/sp125m/responses/loop-1/*.txt | awk -F 'Time: | ms' '{print $2}' > execution_time.txt
-
-# # the same with no empty lines
-# tail -n1 /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/results/aws/v1/queries/sp125m/responses/loop-1/*.txt | awk -F 'Time: | ms' '{print $2}' | sed '/^$/d' > execution_time.txt
-
-
-# function to extract the execution time of each txt file in all subfolders
-# and save the result in a file called "execution_time.txt"
-# using tail + sed
-# use input_dir as parameter that has subfolders with .txt files
-# function execution_times {
-#     local input_dir=$1
-#     for dir in "$input_dir"/*; do
-#       # extract the exec times of each txt file in the subfolders and append them to a file
-#       # in an ordered way, the first .txt of each subfolder, then the second .txt of each subfolder, etc.
-#       tail -n1 "$dir"/*.txt | sed -n 's/.*Time: \([0-9.]*\) ms.*/\1/p' >> execution_time.txt
-        
-#     done
-# }
