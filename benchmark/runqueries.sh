@@ -1,8 +1,9 @@
 #!/bin/bash
 
 cypher_dir=$1
-exectime_sh=$2
-skip_tout_queries=$3
+measurement_dir=$2
+exectime_sh=$3
+skip_tout_queries=$4
 
 # echo "skip: $skip_tout_queries"
 
@@ -71,7 +72,7 @@ create_penalty_responses() {
 
 # create penalty list
 responses_dir="$cypher_dir/responses"
-penalty_txt="$responses_dir/penalty.txt"
+penalty_txt="$measurement_dir/penalty.txt"
 mkdir -p "$responses_dir"
 echo -n "" > "$penalty_txt"
 

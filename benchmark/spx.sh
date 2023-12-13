@@ -58,7 +58,7 @@ echo_tee "MEASUREMENT, PID, $$"
 
 
 
-### SP2B START ###
+### SP2B ###
 # Generate "-t X" rdf triples 
 # Output: spX.n3
 sp2b=$cwd/sp2b/bin
@@ -87,7 +87,7 @@ $exectime_sh "SP2B" "$sp2b_start" "$sp2b_end"
 ### SP2B END ###
 
 
-### RDF2RAPSQL START ###
+### RDF2RAPSQL ###
 # Input: spX.n3
 # Target: rapsql database
 rdf2rapsql_start=$(get_ts)
@@ -101,7 +101,7 @@ echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
 ### RDF2RAPSQL END ###
 
 
-### WRITECYPHER START ###
+### WRITECYPHER ###
 # Input: graphname, query_dir
 writecypher_start=$(get_ts)
 echo_tee "WRITECYPHER, START, $writecypher_start"
@@ -112,7 +112,7 @@ writecypher_end=$(get_ts)
 echo_tee "WRITECYPHER, END, $writecypher_end"
 echo_tee "$("$exectime_sh" "WRITECYPHER" "$writecypher_start" "$writecypher_end")"
 
-### RUNQUERIES START ###
+### RUNQUERIES ###
 # ./rapsqlbench.sh -g spcustompart -t 100 -m 25000 -c 8
 # Target: rapsql database
 runqueries_start=$(get_ts)
@@ -120,14 +120,23 @@ echo_tee "RUNQUERIES, START, $runqueries_start"
 
 # Perform queries
 runqueries_sh=$(realpath "$basedir/runqueries.sh")
-"$runqueries_sh" "$cypher_dir" "$exectime_sh" true | tee -a "$measurement_file" || exit 1
+"$runqueries_sh" "$cypher_dir" "$measurement_dir" "$exectime_sh" true | tee -a "$measurement_file" || exit 1
 
 runqueries_end=$(get_ts)
 echo_tee "RUNQUERIES, END, $runqueries_end"
 echo_tee "$("$exectime_sh" "RUNQUERIES" "$runqueries_start" "$runqueries_end")"
 
-
-
+### CALCULATE PERFORMANCE ###
+# Input: cypher_dir, measurement_dir
+# Output: exectimes.csv, performance.csv
+calcperformance_start=$(get_ts)
+echo_tee "CALCPERFORMANCE, START, $calcperformance_start"
+# Run calcperformance
+calcperformance_sh=$(realpath "$basedir/calcperformance.sh")
+"$calcperformance_sh" "$cypher_dir" "$measurement_dir" | tee -a "$measurement_file" || exit 1
+calcperformance_end=$(get_ts)
+echo_tee "CALCPERFORMANCE, END, $calcperformance_end"
+echo_tee "$("$exectime_sh" "CALCPERFORMANCE" "$calcperformance_start" "$calcperformance_end")"
 
 ### MEASUREMENT END ###
 measurement_end=$(get_ts)
