@@ -59,13 +59,13 @@ variable "vm_map" {
     #   instance_type = "t2.micro"
     #   ebs_size      = 30
     # }
-    "vm50k" = {
+    "vm50k2" = {
       ami           = "ami-04e601abe3e1a910f"
       instance_type = "r5.8xlarge"
-      ebs_size      = 15
+      ebs_size      = 30
     }
     # "vm100k" = {
-    #   ami           = "ami-04e601abe3e1a910f"
+    #   ami           = "ami-04e601abe3e1a910f"W
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 30
     # }

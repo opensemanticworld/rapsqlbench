@@ -29,7 +29,6 @@
   become: yes
   become_user: root
   tasks:
-
     - name: Install curl and ca-certificates
       apt:
         name:
@@ -38,7 +37,7 @@
         state: present
         update_cache: yes
 
-    - name: Check if PostgreSQL is installed
+    - name: Check if PostgreSQL 15 is installed
       ansible.builtin.stat:
         path: /usr/lib/postgresql/15/bin/postgres
       register: pg_15
@@ -57,7 +56,7 @@
       when: not pg_15.stat.exists
 
     - name: Add PostgreSQL repository
-      shell: "sudo sh -c 'echo \"deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main\" > /etc/apt/sources.list.d/pgdg.list'"
+      ansible.builtin.shell: "sudo sh -c 'echo \"deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main\" > /etc/apt/sources.list.d/pgdg.list'"
       when: not pg_15.stat.exists
 
     - name: Install PostgreSQL 15
@@ -67,82 +66,59 @@
         update_cache: yes
       when: not pg_15.stat.exists
 
+    - name: Install openjdk-11-jre-headless
+      ansible.builtin.apt:
+        name: openjdk-11-jre-headless
+        state: present
+        update_cache: yes
 
-    # - name: Install required packages ca-certificates, curl, gnupg
-    #   apt:
-    #     name:
-    #       - ca-certificates
-    #       - curl
-    #       # - gnupg
-    #     state: present
+    - name: Install Apache AGE requirements
+      ansible.builtin.apt:
+        name:
+          - build-essential
+          - libreadline-dev
+          - zlib1g-dev
+          - flex
+          - bison
+        state: present
+        update_cache: yes
 
-    # - name: Check if PostgreSQL 15 repository exists
-    #   ansible.builtin.stat:
-    #     path: /etc/apt/sources.list.d/pgdg.list
-    #   register: pg_repository
+    - name: Install necessary headers and libraries for PostgreSQL 15
+      ansible.builtin.apt:
+        name:
+          - postgresql-server-dev-15
+        state: present
+        update_cache: yes
 
-    # - name: Create the PostgreSQL file repository configuration
-    #   ansible.builtin.copy:
-    #     content: "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main"
-    #     dest: /etc/apt/sources.list.d/pgdg.list
-    #   when: not pg_repository.stat.exists
+    - name: Clone Apache AGE repository from branch release/PG15/1.5.0
+      ansible.builtin.git:
+        repo: https://github.com/apache/age.git
+        dest: /tmp/age
+        version: release/PG15/1.5.0
 
-    # - name: Check if PostgreSQL signing key exists
-    #   ansible.builtin.stat:
-    #     path: /etc/apt/trusted.gpg.d/apt.postgresql.org-archive-keyring.gpg
-    #   register: pg_key
+    - name: Check if Apache AGE is installed
+      ansible.builtin.stat:
+        path: /usr/share/postgresql/15/extension/age.control
+      register: age
 
-    # - name: Import the PostgreSQL repository signing key
-    #   ansible.builtin.raw: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-    #   when: not pg_key.stat.exists
+    - name: Install Apache AGE 
+      ansible.builtin.shell: make install
+      args:
+        chdir: /tmp/age
+      when: not age.stat.exists
 
-    # - name: Update apt cache
-    #   ansible.builtin.apt:
-    #     update_cache: yes
+    # deprecated warning is a bug
+    # https://github.com/ansible-collections/ansible.posix/issues/468
+    - name: Synchronization benchmark of rapsqlbench to remote
+      ansible.posix.synchronize:
+        src: ../benchmark
+        dest: /tmp
 
-    # - name: Install PostgreSQL 15
-    #   ansible.builtin.apt:
-    #     name: postgresql-15
-    #     state: present
-
-
-    # - name: Install openjdk-11-jre-headless
-    #   ansible.builtin.apt:
-    #     name: openjdk-11-jre-headless
-    #     state: present
-    #     update_cache: yes
-
-    # - name: Install Apache AGE requirements
-    #   ansible.builtin.apt:
-    #     name:
-    #       - build-essential
-    #       - libreadline-dev
-    #       - zlib1g-dev
-    #       - flex
-    #       - bison
-    #     state: present
-    #     update_cache: yes
-
-    # - name: Install necessary headers and libraries for PostgreSQL
-    #   ansible.builtin.apt:
-    #     name:
-    #       - postgresql-server-dev-15
-    #     state: present
-    #     update_cache: yes
-
-
-    # # deprecated warning is a bug
-    # # https://github.com/ansible-collections/ansible.posix/issues/468
-    # - name: Synchronization benchmark of rapsqlbench to remote
-    #   ansible.posix.synchronize:
-    #     src: ../benchmark
-    #     dest: /tmp
-
-    # - name: Set permissions for synchronized files
-    #   ansible.builtin.file:
-    #     path: /tmp/benchmark  
-    #     mode: "ugo+rwx"       
-    #     recurse: yes          
+    - name: Set permissions for synchronized files
+      ansible.builtin.file:
+        path: /tmp/benchmark  
+        mode: "ugo+rwx"       
+        recurse: yes          
 
     # - name: Synchronization rapsql-docker of rapsqlbench to remote
     #   ansible.posix.synchronize:
