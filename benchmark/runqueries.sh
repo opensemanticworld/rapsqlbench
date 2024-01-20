@@ -3,7 +3,8 @@
 cypher_dir=$1
 measurement_dir=$2
 exectime_sh=$3
-skip_tout_queries=$4
+iterations=$4
+skip_tout_queries=$5
 
 # echo "skip: $skip_tout_queries"
 
@@ -77,20 +78,23 @@ mkdir -p "$responses_dir"
 echo -n "" > "$penalty_txt"
 
 # run all cypher queries in cypher_dir
-for i in {1..10}; do
+for ((i=1; i<=iterations; i++)) do
   responses_loop_dir="$cypher_dir/responses/loop-$i"
   mkdir -p "$responses_loop_dir"
   for cypher_file in "$cypher_dir"/*.sql; do
   cypher_file_name=$(basename "$cypher_file" .sql)
     cypher_responses_file="$responses_loop_dir/$cypher_file_name".txt
     log_msg="QUERY-EXEC | loop-$i | $cypher_file_name"
+    
+    # Wait for 3 s before each query
+    sleep 3
+
     start_ts=$(get_ts)
     echo "$log_msg, START, $start_ts"
     # echo "cypher_file: $cypher_file"
     
     # run docker exec and save responses to file
     # docker exec rapsqldb-container psql -U postgres -d rapsql -f /mnt/rapsqlbench/benchmark/queries/cypher/"$graph_name"/"$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
-
     psql -U postgres -d rapsql -f "$cypher_dir/$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
 
     end_ts=$(get_ts)

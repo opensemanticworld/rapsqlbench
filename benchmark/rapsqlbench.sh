@@ -63,7 +63,7 @@ check_memory_resources() {
 }
 
 # Parse command line arguments
-while getopts ":g:t:m:c:" opt; do
+while getopts ":g:t:m:c:i:" opt; do
   case $opt in
     g)
       if match_graphname_pattern "$OPTARG"; then
@@ -83,6 +83,11 @@ while getopts ":g:t:m:c:" opt; do
     c)
       if is_positive_integer "$OPTARG" "$opt"; then
         cores=$OPTARG
+      fi
+      ;;
+    i)
+      if is_positive_integer "$OPTARG" "$opt"; then
+        iterations=$OPTARG
       fi
       ;;
     \?)
@@ -141,5 +146,5 @@ check_memory_resources "$mem"
 real_path=$(realpath "$0")
 basedir=$(dirname "$real_path")
 spx_sh=$basedir/spx.sh
-"$spx_sh" "$graphname" "$triples" "$mem" "$cores" || exit 1
+"$spx_sh" "$graphname" "$triples" "$mem" "$cores" "$iterations" || exit 1
 

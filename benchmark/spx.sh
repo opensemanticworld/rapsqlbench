@@ -7,6 +7,7 @@ graphname=$1
 triples=$2
 memory=$3
 cores=$4
+iterations=$5
 
 # Function to get the current timestamp
 get_ts() {
@@ -112,6 +113,7 @@ writecypher_end=$(get_ts)
 echo_tee "WRITECYPHER, END, $writecypher_end"
 echo_tee "$("$exectime_sh" "WRITECYPHER" "$writecypher_start" "$writecypher_end")"
 
+
 ### RUNQUERIES ###
 # ./rapsqlbench.sh -g spcustompart -t 100 -m 25000 -c 8
 # Target: rapsql database
@@ -120,11 +122,12 @@ echo_tee "RUNQUERIES, START, $runqueries_start"
 
 # Perform queries
 runqueries_sh=$(realpath "$basedir/runqueries.sh")
-"$runqueries_sh" "$cypher_dir" "$measurement_dir" "$exectime_sh" true | tee -a "$measurement_file" || exit 1
+"$runqueries_sh" "$cypher_dir" "$measurement_dir" "$exectime_sh" "$iterations" true | tee -a "$measurement_file" || exit 1
 
 runqueries_end=$(get_ts)
 echo_tee "RUNQUERIES, END, $runqueries_end"
 echo_tee "$("$exectime_sh" "RUNQUERIES" "$runqueries_start" "$runqueries_end")"
+
 
 ### CALCULATE PERFORMANCE ###
 # Input: cypher_dir, measurement_dir
@@ -132,11 +135,12 @@ echo_tee "$("$exectime_sh" "RUNQUERIES" "$runqueries_start" "$runqueries_end")"
 calcperformance_start=$(get_ts)
 echo_tee "CALCPERFORMANCE, START, $calcperformance_start"
 # Run calcperformance
-calcperformance_sh=$(realpath "$basedir/calcperformance.sh")
+calcperformance_sh=$(realpath "$basedir/calcp.sh")
 "$calcperformance_sh" "$cypher_dir" "$measurement_dir" | tee -a "$measurement_file" || exit 1
 calcperformance_end=$(get_ts)
 echo_tee "CALCPERFORMANCE, END, $calcperformance_end"
 echo_tee "$("$exectime_sh" "CALCPERFORMANCE" "$calcperformance_start" "$calcperformance_end")"
+
 
 ### MEASUREMENT END ###
 measurement_end=$(get_ts)
