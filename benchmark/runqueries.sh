@@ -93,9 +93,8 @@ for ((i=1; i<=iterations; i++)) do
     echo "$log_msg, START, $start_ts"
     # echo "cypher_file: $cypher_file"
     
-    # run docker exec and save responses to file
-    # docker exec rapsqldb-container psql -U postgres -d rapsql -f /mnt/rapsqlbench/benchmark/queries/cypher/"$graph_name"/"$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
-    psql -U postgres -d rapsql -f "$cypher_dir/$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
+    # run psql exec and save responses to file
+    psql -U postgres -d postgres -f "$cypher_dir/$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
 
     end_ts=$(get_ts)
     echo "$log_msg, END, $end_ts"
@@ -108,22 +107,6 @@ for ((i=1; i<=iterations; i++)) do
   penalize_tout_query "$responses_loop_dir" "$i" "$penalty_txt"
 done
 
-
-
-
-# # run all cypher queries in cypher_dir 10 times
-# for cypher_file in "$cypher_dir"/*.sql; do
-#   cypher_file_name=$(basename "$cypher_file" .sql)
-#   for i in {1..10}; do
-#     start_ts=$(get_ts)
-#     echo "START, $cypher_file_name, $start_ts"
-#     echo "cypher_file: $cypher_file"
-#     # docker exec rapsqldb-container psql -U postgres -d rapsql -f mnt/rapsqlbench/benchmark/queries/cypher/"$cypher_file"
-#     end_ts=$(get_ts)
-#     echo "END, $cypher_file_name, $end_ts"
-#     $exectime_sh "$cypher_file_name" "$start_ts" "$end_ts" 
-#   done
-# done
 
 # prevent EOF error
 exit 0

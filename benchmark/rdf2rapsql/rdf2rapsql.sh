@@ -81,7 +81,7 @@ import_dir="$data_dir"/"import"
 init_sql="$import_dir"/init.sql
 ensure_path "$init_sql"
 # Init rapsql graph using init.sql
-psql -q -U postgres -d rapsql -f "$init_sql" > "$rapsql_txt" || exit 1
+psql -q -U postgres -d postgres -f "$init_sql" > "$rapsql_txt" || exit 1
 
 
 # Created node sql files
@@ -130,30 +130,30 @@ dbimport_edges_end=$(get_ts)
 echo "DBIMPORT-EDGES, END, $dbimport_edges_end"
 $exectime_sh "DBIMPORT-EDGES" "$dbimport_edges_start" "$dbimport_edges_end"
 
-# Input: *.ypg
-# Output: *.csv, import.sql
-# csv2rapsql_start=$(get_ts)
-# echo "CSV2RAPSQL, START, $csv2rapsql_start"
-# # taskset -c 0-$(($(nproc)-1)) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# $csv2rapsql_sh "$graphname" "$nres_csv" "$nlit_csv" "$nbn_csv" "$edtp_csv" "$eop_csv" "$import_sql" "$writesql_sh" "$exectime_sh" "$epart_sh" || exit 1
-
-# taskset -c $(seq -s, 0 $((cores-1))) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
+Input: *.ypg
+Output: *.csv, import.sql
+csv2rapsql_start=$(get_ts)
+echo "CSV2RAPSQL, START, $csv2rapsql_start"
 # taskset -c 0-$(($(nproc)-1)) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# numactl --physcpubind=all --membind=all "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# numactl --physcpubind=all "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# csv2rapsql_end=$(get_ts)
-# echo "CSV2RAPSQL, END, $csv2rapsql_end"
-# $exectime_sh "CSV2RAPSQL" "$csv2rapsql_start" "$csv2rapsql_end"
+$csv2rapsql_sh "$graphname" "$nres_csv" "$nlit_csv" "$nbn_csv" "$edtp_csv" "$eop_csv" "$import_sql" "$writesql_sh" "$exectime_sh" "$epart_sh" || exit 1
 
-# # Run db import
-# # Input: import.sql
-# dbimport_start=$(get_ts)
-# echo "DBIMPORT, START, $dbimport_start"
-# # psql -U postgres -d rapsql -f "$data_dir/import.sql" > "$measurement_dir"/rapsql.txt || exit  
-# # psql without notices -q
-# psql -q -U postgres -d rapsql -f "$import_sql" > "$measurement_dir"/rapsql.txt || exit 1
-# # psql -U postgres -d rapsql -f "$data_dir/import.sql" > /dev/null || exit  
-# # docker exec -it rapsqldb-container psql "postgres://postgres:postgres@rapsqldb:5432/rapsql" -f "mnt/rdf2rapsql/data/sp100/import.sql"
-# dbimport_end=$(get_ts)
-# echo "DBIMPORT, END, $dbimport_end"
-# $exectime_sh "DBIMPORT" "$dbimport_start" "$dbimport_end"
+taskset -c $(seq -s, 0 $((cores-1))) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
+taskset -c 0-$(($(nproc)-1)) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
+numactl --physcpubind=all --membind=all "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
+numactl --physcpubind=all "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
+csv2rapsql_end=$(get_ts)
+echo "CSV2RAPSQL, END, $csv2rapsql_end"
+$exectime_sh "CSV2RAPSQL" "$csv2rapsql_start" "$csv2rapsql_end"
+
+# Run db import
+# Input: import.sql
+dbimport_start=$(get_ts)
+echo "DBIMPORT, START, $dbimport_start"
+# psql -U postgres -d postgres -f "$data_dir/import.sql" > "$measurement_dir"/rapsql.txt || exit  
+# psql without notices -q
+psql -q -U postgres -d postgres -f "$import_sql" > "$measurement_dir"/rapsql.txt || exit 1
+# psql -U postgres -d postgres -f "$data_dir/import.sql" > /dev/null || exit  
+# docker exec -it rapsqldb-container psql "postgres://postgres:postgres@rapsqldb:5432/rapsql" -f "mnt/rdf2rapsql/data/sp100/import.sql"
+dbimport_end=$(get_ts)
+echo "DBIMPORT, END, $dbimport_end"
+$exectime_sh "DBIMPORT" "$dbimport_start" "$dbimport_end"

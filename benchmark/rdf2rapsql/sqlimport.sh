@@ -9,8 +9,8 @@ sql_files=$(find "$sql_dir" -name "*.sql")
 # Loop through each .sql file and execute it in the background
 for file in $sql_files; do
    # Execute all .sql files in the background
-  psql -q -U postgres -d rapsql -f "$file" >> "$measurement_file" &
-  # psql -q -U postgres -d rapsql -f "$file" >> "$measurement_file" || exit 1
+  psql -q -U postgres -d postgres -f "$file" >> "$measurement_file" &
+  # psql -q -U postgres -d postgres -f "$file" >> "$measurement_file" || exit 1
 done
 
 # While loop sql_files parallel execution
@@ -19,7 +19,7 @@ done
 #   {
 #     # Place your command or script here
 #     echo "Processing $line"
-#     psql -q -U postgres -d rapsql -f "$line" >> "$measurement_file" || exit 1
+#     psql -q -U postgres -d postgres -f "$line" >> "$measurement_file" || exit 1
 #   } &
 # done < "$sql_files"
 

@@ -90,19 +90,19 @@ docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp1m2
 Set `timeout` to 10 seconds:
 
 ```bash
-docker exec rapsqldb-container psql -U postgres -d rapsql -c "ALTER SYSTEM SET statement_timeout = '5min';"
+docker exec rapsqldb-container psql -U postgres -d postgres -c "ALTER SYSTEM SET statement_timeout = '5min';"
 ```
 
 Set execution time information:
 
 ```bash
-docker exec rapsqldb-container psql -U postgres -d rapsql -c "ALTER SYSTEM SET log_duration = on;"
+docker exec rapsqldb-container psql -U postgres -d postgres -c "ALTER SYSTEM SET log_duration = on;"
 ```
 
 Refresh the configuration:
 
 ```bash
-docker exec rapsqldb-container psql -U postgres -d rapsql -c "SELECT pg_reload_conf();"
+docker exec rapsqldb-container psql -U postgres -d postgres -c "SELECT pg_reload_conf();"
 ```
 
 ## Monitor
