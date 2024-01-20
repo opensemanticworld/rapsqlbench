@@ -4,9 +4,9 @@ cypher_dir=$1
 measurement_dir=$2
 exectime_sh=$3
 iterations=$4
-skip_tout_queries=$5
+skip_penalized_queries=$5
 
-# echo "skip: $skip_tout_queries"
+# echo "skip: $skip_penalized_queries"
 
 # extract graphname from cypher_dir
 
@@ -18,23 +18,24 @@ get_ts() {
   echo "$ts"
 }
 
-penalize_tout_query() {
+penalize_query() {
   local folder="$1"
   local loop_cnt="$2"
   local penalty_file="$3"
   # Find all .txt files in the folder
   files=$(find "$folder" -type f -name "*.txt")
-  # Loop through each file and check the last line for the keyword "timeout"
+  # Loop through each file and check the last line for the keyword "timeout" or "ERROR"
   for file in $files; do
     # last_line=$(tail -n 1 "$file")
     # if [[ $last_line == *timeout* ]]; then
-    if grep -q "statement timeout" "$file"; then
+    # if grep -q "statement timeout" "$file"; then  # only timeout
+    if grep -q "statement timeout" "$file" || grep -q "ERROR" "$file"; then  # timeout and error
       # query name is the filename
       local penalty="3600000.000 ms"
       query=$(basename "$file" .txt).sql
-      echo "QUERY-TOUT | loop-$loop_cnt | $query, PENALTY, $penalty"
-      # make timeout dir in cypher_dir
-      timeouts_dir="$cypher_dir/timeouts/loop-$loop_cnt"
+      echo "QUERY | loop-$loop_cnt | $query, PENALTY, $penalty"
+      # make penalty dir in cypher_dir
+      timeouts_dir="$cypher_dir/penalty/loop-$loop_cnt"
       mkdir -p "$timeouts_dir"
 
       # add penalty time to response file
@@ -42,11 +43,11 @@ penalize_tout_query() {
       # add query txt name to penalty list
       echo "$file" >> "$penalty_file"
 
-      # if skip_tout_queries, then move raw timeout files to timeout dir
-      if [ "$skip_tout_queries" ]; then
-        # move sql file to timeout dir
+      # if skip_penalized_queries, then move raw penalty files to penalty dir
+      if [ "$skip_penalized_queries" ]; then
+        # move sql file to penalty dir
         mv -f "$cypher_dir"/"$query" "$timeouts_dir"/"$query"
-        # move response file to timeout dir
+        # move response file to penalty dir
         # mv -f "$file" "$timeouts_dir/"
       fi
     fi
@@ -100,11 +101,11 @@ for ((i=1; i<=iterations; i++)) do
     echo "$log_msg, END, $end_ts"
     $exectime_sh "$log_msg" "$start_ts" "$end_ts"
   done
-  # if skip_tout_queries, then create penalty responses
-  if [ "$skip_tout_queries" ]; then
+  # if skip_penalized_queries, then create penalty responses
+  if [ "$skip_penalized_queries" ]; then
     create_penalty_responses "$penalty_txt" "$i" "$responses_loop_dir"
   fi
-  penalize_tout_query "$responses_loop_dir" "$i" "$penalty_txt"
+  penalize_query "$responses_loop_dir" "$i" "$penalty_txt"
 done
 
 
