@@ -23,6 +23,9 @@ sql_create_basefile() {
   # Create base file
   echo "--import/$keyword.sql
 
+-- create extension
+CREATE EXTENSION IF NOT EXISTS age;
+
 -- age config
 LOAD 'age';
 SET search_path TO ag_catalog;
