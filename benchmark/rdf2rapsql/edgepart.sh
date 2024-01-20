@@ -73,7 +73,7 @@ while IFS= read -r line; do
     output_csv="${part_dir}/${keyword}.csv"
 
     # echo "output_csv: $output_csv"
-    echo "start_id,start_vertex_type,end_id,end_vertex_type,iri" > "$output_csv"
+    echo "start_id,start_vertex_type,end_id,end_vertex_type,rdfid" > "$output_csv"
     grep ".*$line$" "$raw_file_path" >> "$output_csv"
     # create sql file per edge label
     # sql_create_elabel "$output_sql" "$graph_name" "$keyword"

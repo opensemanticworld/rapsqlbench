@@ -15,8 +15,8 @@ nlit_sql=$sql_dir/$(basename "$rdf2pg_nlit" .csv).sql
 nbn_sql=$sql_dir/$(basename "$rdf2pg_nbn" .csv).sql
 mkdir -p "$sql_dir"
 
-# Create initial sql file
 
+# Create initial sql file: init.sql
 sql_create_basefile() {
   local sql_file="$1"
   local keyword="$2"

@@ -179,13 +179,18 @@
           - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
 
 # INSERT WAITING TIME!!!
+    - name: Sleep for 60 seconds and continue with play
+      ansible.builtin.wait_for:
+        timeout: 60
+      delegate_to: localhost
 
-    # - name: Perform rapsql benchmark by input triple value
-    #   community.docker.docker_container_exec:
-    #     container: rapsqlcontainer
-    #     command: /bin/bash rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m 250000 -c 32
-    #     chdir: /mnt
-    #   register: rapsqlbench
+    - name: Perform rapsql benchmark by input triple value
+      community.docker.docker_container_exec:
+        container: rapsqlcontainer
+        # command: /bin/bash rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ mem }} -c {{ cores }} -i {{ iter }}
+        command: /bin/bash rapsqlbench.sh -g {{ g }} -t {{ t }} -m 250000 -c 32 -i {{ i }}
+        chdir: /mnt
+      register: rapsqlbench
       
     # - name: Show rapsqlbench results
     #   ansible.builtin.debug:
@@ -204,21 +209,21 @@
     # - name: Synchronize measurement from remote
     #   ansible.posix.synchronize:
     #     src: /mnt/benchmark/measurement/
-    #     dest: ../results/aws/v{{ version }}/measurement
+    #     dest: ../results/aws/{{ version }}/measurement
     #     mode: pull
     #     delete: no
 
     # - name: Synchronize queries from remote
     #   ansible.posix.synchronize:
     #     src: /mnt/benchmark/queries/cypher/
-    #     dest: ../results/aws/v{{ version }}/queries
+    #     dest: ../results/aws/{{ version }}/queries
     #     mode: pull
     #     delete: no
     
     # - name: Synchronize data from remote
     #   ansible.posix.synchronize:
     #     src: /mnt/benchmark/data/
-    #     dest: ../results/aws/v{{ version }}/data
+    #     dest: ../results/aws/{{ version }}/data
     #     mode: pull
     #     delete: no    
     

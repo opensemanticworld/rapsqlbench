@@ -5,16 +5,17 @@ query_dir=$2
 
 # rapsqltranspiler version
 # version="v0.1.2-L2L-L2R"
-version="v0.1.3-L2L"
+# version="v0.1.3-L2L"
+version="v0.2.0-rdfid"
 
 # Paths
 sparql_dir="$query_dir/sparql"
 cypher_dir="$query_dir/cypher/$graph_name"
 # cypher_dir="$query_dir/cypher/$version/$graph_name"
 dir_path=$(dirname "$(realpath "$0")")
-q6provider_sh="$dir_path/q6provider.sh"
-q7provider_sh="$dir_path/q7provider.sh"
-rapsqltranspiler_jar="$dir_path/rapsqltranspiler-$version.jar"
+q6provider_sh="$dir_path/$version/q6provider.sh"
+q7provider_sh="$dir_path/$version/q7provider.sh"
+rapsqltranspiler_jar="$dir_path/$version/rapsqltranspiler-$version.jar"
 
 # Target directory
 mkdir -p "$cypher_dir"

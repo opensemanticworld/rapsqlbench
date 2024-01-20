@@ -79,6 +79,12 @@ sudo rm -rf /usr/local/docker/masterthesis/rapsql/mnt/rapsqlbench/benchmark/data
 docker exec rapsqlcontainer /mnt/data/sp1m/rapsqlbench.sh -g sp1m -t 1000000 -m 250000 -c 32
 ```
 
+```bash
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp1mnew1 -t 1000000 -m 25000 -c 8 -i 1
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp1mnew1 -t 1000000 -m 15000 -c 8 -i 1
+docker exec rapsqldb-container mnt/rapsqlbench/benchmark/rapsqlbench.sh -g sp1m2 -t 1000000 -m 15000 -c 1 -i 1
+```
+
 ## Postgres
 
 Set `timeout` to 10 seconds:
