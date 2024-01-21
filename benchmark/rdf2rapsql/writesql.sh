@@ -77,12 +77,12 @@ sql_cnt_rapsqltriples() {
   # Append count rapsqltriples statement
   echo "
 -- via indexed age labels table of edges
-SELECT COUNT(*) from $graph_name._ag_label_edge;
+SELECT COUNT(*) AS table_cnt from $graph_name._ag_label_edge;
 
 -- via cypher path
-SELECT COUNT(*) FROM cypher('$graph_name', $$
+SELECT COUNT(*) AS cypher_cnt FROM cypher('$graph_name', \$\$
 MATCH (nl)-[e]->(nr)
-RETURN nl, e, nr $$)
+RETURN nl, e, nr \$\$)
 AS (nl agtype, e agtype, nr agtype);
 " >> "$sql_file"
 }

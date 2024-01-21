@@ -127,21 +127,24 @@ tail -f -n +1 /mnt/benchmark/measurement/sp1bil/measurement.csv
 3. Perform benchmark using Ansible via `deploy-conf.yml` and Posgres setup via `pgconf.yml`, e.g. with vm for 50k triple dataset `vm50k` from `terraform` directory`:
 
 ```bash
+# general (dynamic vm name)
+ansible-playbook -i ./inventory/VMNAME-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+# e.g. 
 ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
 ```
 
 ### Monitor measurment file
 
 ```bash
-# general
+# general (dynamic ip)
 ssh ubuntu@INVENTORY_IP_TXT
-# e.g. (dynamic ip)
+# e.g. 
 ssh ubuntu@3.66.144.155
 ```
 
 ```bash
-# general
+# general (dynamic graph name)
 tail -f -n +1 /tmp/benchmark/measurement/GRAPH_NAME/measurement.csv
-# e.g. (dynamic graph name)
+# e.g. 
 tail -f -n +1 /tmp/benchmark/measurement/sp50k6/measurement.csv
 ```

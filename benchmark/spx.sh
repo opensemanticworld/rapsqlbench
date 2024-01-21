@@ -124,10 +124,10 @@ rapsqltriples_txt="$measurement_dir"/rapsqltriples.txt
 sleep 5
 # Count of all processed triples from rdf2pg 
 rapsqltriples_cnt=$(get_ts)
-echo "RAPSQLTRIPLES-CNT, START, $rapsqltriples_cnt"
+echo_tee "RAPSQLTRIPLES-CNT, START, $rapsqltriples_cnt"
 sudo -u postgres psql -q -U postgres -d postgres -f "$rapsqltriples_sql" > "$rapsqltriples_txt" || exit 1
-echo "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt"
-$exectime_sh "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt" "$rapsqltriples_cnt"
+echo_tee "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt"
+echo_tee "$("$exectime_sh" "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt" "$rapsqltriples_cnt")"
 
 
 ### RUNQUERIES ###

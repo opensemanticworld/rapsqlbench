@@ -1,3 +1,11 @@
+########## RAPSQLbench config ##########
+graphname: sp50k7
+triples: 50000
+memory: 250000
+cores: 32
+iterations: 1
+
+########## PostgreSQL config ##########
 # max_connections: 20
 shared_buffers: 64GB
 # work_mem: 400MB

@@ -100,6 +100,13 @@
         chdir: /tmp/age
       when: not age.stat.exists
 
+    - name: Install openjdk-11-jre-headless
+      ansible.builtin.apt:
+        name: openjdk-11-jre-headless
+        state: present
+        update_cache: yes
+# End: Provide Software
+
 
 
 # POSTGRES CONFIGURATION
@@ -232,17 +239,13 @@
         state: restarted
 
 
-    - name: wait for postgresql to restart
+    - name: Wait for Postgres to restart
       ansible.builtin.wait_for:
         port: 5432
         delay: 5
         timeout: 300
 
-    - name: Install openjdk-11-jre-headless
-      ansible.builtin.apt:
-        name: openjdk-11-jre-headless
-        state: present
-        update_cache: yes
+
 
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
@@ -287,7 +290,7 @@
 
     - name: Perform RAPSQLBench 
       ansible.builtin.shell: 
-        cmd: ./rapsqlbench.sh -g sp50k6 -t 50000 -m 250000 -c 32 -i 1
+        cmd: ./rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
 
 
