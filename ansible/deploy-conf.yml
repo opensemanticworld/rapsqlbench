@@ -144,8 +144,6 @@
         regex: '^#?work_mem'
         line: 'work_mem = {{ work_mem | default("4MB") }}'
         state: present
-
-
     
     - name: Set `maintenance_work_mem`
       lineinfile:
