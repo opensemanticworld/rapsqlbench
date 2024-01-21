@@ -123,11 +123,12 @@ rapsqltriples_txt="$measurement_dir"/rapsqltriples.txt
 # Wait for 5 s after rdf2rapsql
 sleep 5
 # Count of all processed triples from rdf2pg 
-rapsqltriples_cnt=$(get_ts)
-echo_tee "RAPSQLTRIPLES-CNT, START, $rapsqltriples_cnt"
+rapsqltriples_cnt_start=$(get_ts)
+echo_tee "RAPSQLTRIPLES-CNT, START, $rapsqltriples_cnt_start"
 sudo -u postgres psql -q -U postgres -d postgres -f "$rapsqltriples_sql" > "$rapsqltriples_txt" || exit 1
-echo_tee "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt"
-echo_tee "$("$exectime_sh" "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt" "$rapsqltriples_cnt")"
+rapsqltriples_cnt_end=$(get_ts)
+echo_tee "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt_end"
+echo_tee "$("$exectime_sh" "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt_start" "$rapsqltriples_cnt_end")"
 
 
 ### RUNQUERIES ###
@@ -139,7 +140,6 @@ sleep 5
 
 runqueries_start=$(get_ts)
 echo_tee "RUNQUERIES, START, $runqueries_start"
-
 # Perform queries
 runqueries_sh=$(realpath "$basedir/runqueries.sh")
 "$runqueries_sh" "$cypher_dir" "$measurement_dir" "$exectime_sh" "$iterations" true | tee -a "$measurement_file" || exit 1
