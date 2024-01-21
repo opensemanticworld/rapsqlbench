@@ -4,6 +4,7 @@ graph_name=$1
 query_dir=$2
 
 ### rapsqltranspiler version ###
+# version="v0.1.1-rdfid"
 # version="v0.1.2-L2L-L2R"
 # version="v0.1.3-L2L"
 # version="v0.2.0-rdfid"

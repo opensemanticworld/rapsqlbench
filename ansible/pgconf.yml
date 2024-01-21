@@ -1,9 +1,9 @@
 ########## RAPSQLbench config ##########
-graphname: sp50k9
-triples: 50000
+graphname: sp250k1i3
+triples: 250000
 memory: 250000
 cores: 32
-iterations: 1
+iterations: 3
 
 ########## PostgreSQL config ##########
 statement_timeout: 30min

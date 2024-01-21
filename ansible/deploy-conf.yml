@@ -258,7 +258,7 @@
 
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
-    - name: Synchronization benchmark of rapsqlbench to remote
+    - name: Synchronize `benchmark` dir of rapsqlbench to remote `tmp` dir
       ansible.posix.synchronize:
         src: ../benchmark
         dest: /tmp
