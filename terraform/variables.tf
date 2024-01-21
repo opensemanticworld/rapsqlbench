@@ -69,6 +69,11 @@ variable "vm_map" {
       instance_type = "r5.8xlarge"
       ebs_size      = 200
     }
+    "vm250k4" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 200
+    }
     # "vm1m" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
