@@ -76,7 +76,8 @@ sql_cnt_rapsqltriples() {
   local sql_file="$1"
   local graph_name="$2"
   # Append count rapsqltriples statement
-  echo "
+  echo -E "
+
 -- via indexed age labels table of edges
 SELECT COUNT(*) AS table_cnt from $graph_name._ag_label_edge;
 
