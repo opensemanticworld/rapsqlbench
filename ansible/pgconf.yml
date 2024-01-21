@@ -6,7 +6,7 @@ cores: 32
 iterations: 1
 
 ########## PostgreSQL config ##########
-# statement_timeout: 30min
+statement_timeout: 30min
 # max_connections: 32
 # shared_buffers: 8GB
 # effective_cache_size: 125GB
