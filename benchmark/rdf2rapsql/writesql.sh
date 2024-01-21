@@ -19,8 +19,9 @@ mkdir -p "$sql_dir"
 
 # Create initial sql file: init.sql
 sql_create_basefile() {
-  local sql_file="$1"
-  local keyword="$2"
+  local msg="$1"
+  local sql_file="$2"
+  local keyword="$3"
   # Create base file
   echo "--import/$keyword.sql
 
@@ -34,7 +35,7 @@ SET search_path TO ag_catalog;
 -- disable notices https://stackoverflow.com/a/3531274
 SET client_min_messages TO WARNING;
 
-SELECT now() AS \"START DBIMPORT $keyword\";
+SELECT now() AS \"$msg $keyword\";
 " > "$sql_file"
 }
 
@@ -88,11 +89,11 @@ AS (nl agtype, e agtype, nr agtype);
 }
 
 # Create sql files
-sql_create_basefile "$init_sql" "$graph_name"
-sql_create_basefile "$nres_sql" "Resource"
-sql_create_basefile "$nlit_sql" "Literal"
-sql_create_basefile "$nbn_sql" "BlankNode"
-sql_create_basefile "$rapsqltriples_sql" "rapsqltriples"
+sql_create_basefile "INIT" "$init_sql" "$graph_name"
+sql_create_basefile "IMPORT" "$nres_sql" "Resource"
+sql_create_basefile "IMPORT" "$nlit_sql" "Literal"
+sql_create_basefile "IMPORT" "$nbn_sql" "BlankNode"
+sql_create_basefile "COUNT" "$rapsqltriples_sql" "rapsqltriples"
 
 # Append statements to sql files
 sql_create_graph "$init_sql" "$graph_name"
