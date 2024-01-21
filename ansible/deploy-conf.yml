@@ -109,7 +109,7 @@
 
 
 
-# POSTGRES CONFIGURATION
+# Begin: POSTGRES CONFIGURATION
     - name: Set `statement_timeout` 
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
@@ -237,14 +237,10 @@
     #     line: 'max_parallel_maintenance_workers = {{ max_parallel_maintenance_workers | default("2") }}'
     #     state: present
 
-
-
-
     - name: Restart Service Postgres
       ansible.builtin.service:
         name: postgresql
         state: restarted
-
 
     - name: Wait for Postgres to restart
       ansible.builtin.wait_for:
@@ -252,8 +248,19 @@
         delay: 5
         timeout: 300
 
+    - name: Copy postgresql.conf to `measurement` dir
+      ansible.builtin.copy:
+        src: /etc/postgresql/15/main/postgresql.conf
+        dest: /tmp/benchmark/measurement/postgresql.conf
+# End: POSTGRES CONFIGURATION
 
 
+# Begin: RAPSQLBench
+- hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
     - name: Synchronize `benchmark` dir of rapsqlbench to remote `tmp` dir
@@ -261,6 +268,11 @@
         src: ../benchmark
         dest: /tmp
 
+    - name: Perform RAPSQLBench 
+      ansible.builtin.shell: 
+        cmd: ./rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
+        chdir: /tmp/benchmark    
+# End: RAPSQLBench
 
 
 
@@ -294,11 +306,6 @@
 #         msg: "{{ set.name }} {{ set.prev_val_pretty }} >> {{ set.value_pretty }} restart_req: {{ set.restart_required }}"
 #       when: set.changed
 
-
-    - name: Perform RAPSQLBench 
-      ansible.builtin.shell: 
-        cmd: ./rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
-        chdir: /tmp/benchmark    
 
 
 
