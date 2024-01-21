@@ -114,9 +114,29 @@ echo_tee "WRITECYPHER, END, $writecypher_end"
 echo_tee "$("$exectime_sh" "WRITECYPHER" "$writecypher_start" "$writecypher_end")"
 
 
+### WARMUP AND IMPORT VERIFICATION ###
+# Input: rapsqltriples.sql
+# Target: rapsql database
+# Output: rapsqltriples.txt
+rapsqltriples_sql="$data_dir"/import/rapsqltriples.sql
+rapsqltriples_txt="$measurement_dir"/rapsqltriples.txt
+# Wait for 5 s after rdf2rapsql
+sleep 5
+# Count of all processed triples from rdf2pg 
+rapsqltriples_cnt=$(get_ts)
+echo "RAPSQLTRIPLES-CNT, START, $rapsqltriples_cnt"
+sudo -u postgres psql -q -U postgres -d postgres -f "$rapsqltriples_sql" > "$rapsqltriples_txt" || exit 1
+echo "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt"
+$exectime_sh "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt" "$rapsqltriples_cnt"
+
+
 ### RUNQUERIES ###
 # ./rapsqlbench.sh -g spcustompart -t 100 -m 25000 -c 8
 # Target: rapsql database
+
+# Wait for 5 s after warmup
+sleep 5
+
 runqueries_start=$(get_ts)
 echo_tee "RUNQUERIES, START, $runqueries_start"
 

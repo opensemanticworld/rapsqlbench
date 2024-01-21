@@ -287,7 +287,7 @@
 
     - name: Perform RAPSQLBench 
       ansible.builtin.shell: 
-        cmd: ./rapsqlbench.sh -g sp50k5 -t 50000 -m 250000 -c 32 -i 1
+        cmd: ./rapsqlbench.sh -g sp50k6 -t 50000 -m 250000 -c 32 -i 1
         chdir: /tmp/benchmark    
 
 

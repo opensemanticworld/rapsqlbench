@@ -9,6 +9,8 @@
   - [Perform a benchmark](#perform-a-benchmark)
     - [Start the benchmark](#start-the-benchmark)
     - [Monitor measurment files](#monitor-measurment-files)
+  - [RAPSQLBench v2](#rapsqlbench-v2)
+    - [Monitor measurment file](#monitor-measurment-file)
 
 ## Prerequisites
 
@@ -116,4 +118,30 @@ tail -f -n +1 /mnt/benchmark/measurement/sp125m/measurement.csv
 tail -f -n +1 /mnt/benchmark/measurement/sp250m/measurement.csv
 tail -f -n +1 /mnt/benchmark/measurement/sp500m/measurement.csv
 tail -f -n +1 /mnt/benchmark/measurement/sp1bil/measurement.csv
+```
+
+## RAPSQLBench v2
+
+1. Login to AWS CLI via `aws configure sso` and your credentials.
+2. Build the desired infrastructure using Terraform via `main.tf` and setup `variables.tf`, e.g. navigate to terraform directory `cd terraform` and run `terraform apply`.
+3. Perform benchmark using Ansible via `deploy-conf.yml` and Posgres setup via `pgconf.yml`, e.g. with vm for 50k triple dataset `vm50k` from `terraform` directory`:
+
+```bash
+ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+```
+
+### Monitor measurment file
+
+```bash
+# general
+ssh ubuntu@INVENTORY_IP_TXT
+# e.g. (dynamic ip)
+ssh ubuntu@3.66.144.155
+```
+
+```bash
+# general
+tail -f -n +1 /tmp/benchmark/measurement/GRAPH_NAME/measurement.csv
+# e.g. (dynamic graph name)
+tail -f -n +1 /tmp/benchmark/measurement/sp50k6/measurement.csv
 ```

@@ -6,9 +6,10 @@ rdf2pg_nres=$2
 rdf2pg_nlit=$3
 rdf2pg_nbn=$4
 
-
+# Paths
 raw_file_dir=$(dirname "$rdf2pg_nres")
 init_sql="$raw_file_dir"/import/init.sql
+rapsqltriples_sql="$raw_file_dir"/import/rapsqltriples.sql
 sql_dir="$raw_file_dir"/import/nodes
 nres_sql=$sql_dir/$(basename "$rdf2pg_nres" .csv).sql
 nlit_sql=$sql_dir/$(basename "$rdf2pg_nlit" .csv).sql
@@ -70,11 +71,28 @@ SELECT load_labels_from_file(
 SELECT now() AS \"END DBIMPORT $vlabel\";" >> "$sql_file"
 }
 
+sql_cnt_rapsqltriples() {
+  local sql_file="$1"
+  local graph_name="$2"
+  # Append count rapsqltriples statement
+  echo "
+-- via indexed age labels table of edges
+SELECT COUNT(*) from $graph_name._ag_label_edge;
+
+-- via cypher path
+SELECT COUNT(*) FROM cypher('$graph_name', $$
+MATCH (nl)-[e]->(nr)
+RETURN nl, e, nr $$)
+AS (nl agtype, e agtype, nr agtype);
+" >> "$sql_file"
+}
+
 # Create sql files
 sql_create_basefile "$init_sql" "$graph_name"
 sql_create_basefile "$nres_sql" "Resource"
 sql_create_basefile "$nlit_sql" "Literal"
 sql_create_basefile "$nbn_sql" "BlankNode"
+sql_create_basefile "$rapsqltriples_sql" "rapsqltriples"
 
 # Append statements to sql files
 sql_create_graph "$init_sql" "$graph_name"
@@ -84,6 +102,7 @@ sql_create_vlabel "$nbn_sql" "$graph_name" "BlankNode"
 sql_load_edges_from_file "$nres_sql" "$graph_name" "Resource" "$rdf2pg_nres"
 sql_load_edges_from_file "$nlit_sql" "$graph_name" "Literal" "$rdf2pg_nlit"
 sql_load_edges_from_file "$nbn_sql" "$graph_name" "BlankNode" "$rdf2pg_nbn"
+sql_cnt_rapsqltriples "$rapsqltriples_sql" "$graph_name"
 
 
 # # Basic Import and node import statements

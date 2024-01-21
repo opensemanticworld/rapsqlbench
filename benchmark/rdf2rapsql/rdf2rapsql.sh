@@ -42,7 +42,7 @@ eop_csv="$data_dir"/eop.csv
 rapsql_txt="$measurement_dir"/rapsql.txt
 edtp_part_txt="$data_dir"/edtp_part.txt
 eop_part_txt="$data_dir"/eop_part.txt
-import_sql="$data_dir"/import.sql
+
 
 # Change directory to data source directory
 cd "$data_dir" || exit 0
@@ -98,8 +98,8 @@ ensure_path "$nbn_sql"
 # Output: {edtp, eop}/*.csv, {edtp, eop}/import/*.sql
 edgepart_start=$(get_ts)
 echo "EDGEPARTITIONING, START, $edgepart_start"
-$edgepart_sh "$graphname" "$edtp_csv" "$edtp_part_txt" "$import_sql" || exit 1
-$edgepart_sh "$graphname" "$eop_csv" "$eop_part_txt" "$import_sql" || exit 1
+$edgepart_sh "$graphname" "$edtp_csv" "$edtp_part_txt" || exit 1
+$edgepart_sh "$graphname" "$eop_csv" "$eop_part_txt" || exit 1
 edgepart_end=$(get_ts)
 echo "EDGEPARTITIONING, END, $edgepart_end"
 $exectime_sh "EDGEPARTITIONING" "$edgepart_start" "$edgepart_end"
@@ -129,6 +129,9 @@ $sqlimport_sh "$edges_dir" "$rapsql_txt" || exit 1
 dbimport_edges_end=$(get_ts)
 echo "DBIMPORT-EDGES, END, $dbimport_edges_end"
 $exectime_sh "DBIMPORT-EDGES" "$dbimport_edges_start" "$dbimport_edges_end"
+
+
+
 
 # Input: *.ypg
 # Output: *.csv, import.sql
