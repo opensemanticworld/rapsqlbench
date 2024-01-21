@@ -16,6 +16,7 @@ terraform.tfstate.backup
 terraform/inventory/
 dev/
 benchmark/rdf2pg/_old_versions
+ansible/ansible.cfg
 ansible/*.yml
 ansible/POSTGRES.md
 ansible/PERFORMANCE.md
