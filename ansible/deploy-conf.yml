@@ -110,6 +110,13 @@
 
 
 # POSTGRES CONFIGURATION
+    - name: Set `statement_timeout` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?statement_timeout'
+        line: 'statement_timeout = {{ statement_timeout | default("0") }}'
+        state: present
+
     - name: Set `max_connections` 
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
@@ -124,6 +131,13 @@
         line: 'shared_buffers = {{ shared_buffers | default("128MB") }}'
         state: present
 
+    - name: Set `effective_cache_size` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?effective_cache_size'
+        line: 'effective_cache_size = {{ effective_cache_size | default("4GB") }}'
+        state: present
+
     - name: Set `work_mem` 
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
@@ -131,12 +145,7 @@
         line: 'work_mem = {{ work_mem | default("4MB") }}'
         state: present
 
-    - name: Set `effective_cache_size` 
-      lineinfile:
-        path: /etc/postgresql/15/main/postgresql.conf
-        regex: '^#?effective_cache_size'
-        line: 'effective_cache_size = {{ effective_cache_size | default("4GB") }}'
-        state: present
+
     
     - name: Set `maintenance_work_mem`
       lineinfile:
