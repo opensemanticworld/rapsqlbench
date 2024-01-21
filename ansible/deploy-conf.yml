@@ -251,7 +251,7 @@
     - name: Copy postgresql.conf to `measurement` dir
       ansible.builtin.copy:
         src: /etc/postgresql/15/main/postgresql.conf
-        dest: /tmp/benchmark/measurement/postgresql.conf
+        dest: /tmp/benchmark/measurement/{{ graphname }}/postgresql.conf
 # End: POSTGRES CONFIGURATION
 
 
