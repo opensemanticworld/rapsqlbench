@@ -29,11 +29,15 @@
   become: yes
   become_user: root
   tasks:
-    - name: Install curl and ca-certificates
-      apt:
+    - name: Install initial packages
+      ansible.builtin.apt:
         name:
+          - dirmngr 
+          - ca-certificates 
+          - software-properties-common 
+          - apt-transport-https 
+          - lsb-release 
           - curl
-          - ca-certificates
         state: present
         update_cache: yes
 
@@ -42,37 +46,26 @@
         path: /usr/lib/postgresql/15/bin/postgres
       register: pg_15
 
-    - name: Create directory /usr/share/postgresql-common/pgdg
-      file:
-        path: /usr/share/postgresql-common/pgdg
-        state: directory
+    - name: Import PostgreSQL 15 APT Repository 
+      ansible.builtin.shell:
+        cmd: curl -fSsL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql.gpg > /dev/null
       when: not pg_15.stat.exists
 
-    - name: Download apt.postgresql.org.asc file
-      get_url:
-        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-        dest: /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
-        force: yes
-      when: not pg_15.stat.exists
-
-    - name: Add PostgreSQL repository
-      ansible.builtin.shell: "sudo sh -c 'echo \"deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main\" > /etc/apt/sources.list.d/pgdg.list'"
+    - name: Import PostgreSQL 15 stable APT repository
+      ansible.builtin.shell:
+        cmd: echo deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main | sudo tee /etc/apt/sources.list.d/postgresql.list
       when: not pg_15.stat.exists
 
     - name: Install PostgreSQL 15
       ansible.builtin.apt:
-        name: postgresql-15
-        state: present
-        update_cache: yes
-      when: not pg_15.stat.exists
-
-    - name: Install openjdk-11-jre-headless
-      ansible.builtin.apt:
-        name: openjdk-11-jre-headless
+        name:
+          - postgresql-15
+          - postgresql-client-15
+          # - postgresql-contrib-15
         state: present
         update_cache: yes
 
-    - name: Install Apache AGE requirements
+    - name: Install required packages for Apache AGE
       ansible.builtin.apt:
         name:
           - build-essential
@@ -107,6 +100,150 @@
         chdir: /tmp/age
       when: not age.stat.exists
 
+
+
+# POSTGRES CONFIGURATION
+    - name: Set `max_connections` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_connections'
+        line: 'max_connections = {{ max_connections | default("100") }}'
+        state: present
+
+    - name: Set `shared_buffers` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?shared_buffers'
+        line: 'shared_buffers = {{ shared_buffers | default("128MB") }}'
+        state: present
+
+    - name: Set `work_mem` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?work_mem'
+        line: 'work_mem = {{ work_mem | default("4MB") }}'
+        state: present
+
+    - name: Set `effective_cache_size` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?effective_cache_size'
+        line: 'effective_cache_size = {{ effective_cache_size | default("4GB") }}'
+        state: present
+    
+    - name: Set `maintenance_work_mem`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?maintenance_work_mem'
+        line: 'maintenance_work_mem = {{ maintenance_work_mem | default("64MB") }}'
+        state: present
+    
+    # - name: Set `checkpoint_completion_target`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?checkpoint_completion_target'
+    #     line: 'checkpoint_completion_target = {{ checkpoint_completion_target | default("0.9") }}'
+    #     state: present
+    
+    # - name: Set `wal_buffers`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?wal_buffers'
+    #     # -1 = based on shared_buffers
+    #     line: 'wal_buffers = {{ wal_buffers | default("-1") }}' 
+    #     state: present
+    
+    # - name: Set `default_statistics_target`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?default_statistics_target'
+    #     line: 'default_statistics_target = {{ default_statistics_target | default("100") }}'
+    #     state: present
+    
+    # - name: Set `random_page_cost`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?random_page_cost'
+    #     line: 'random_page_cost = {{ random_page_cost | default("4.0") }}'
+    #     state: present
+
+    # - name: Set `effective_io_concurrency`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?effective_io_concurrency'
+    #     line: 'effective_io_concurrency = {{ effective_io_concurrency | default("1") }}'
+    #     state: present
+    
+    # - name: Set `huge_pages`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?huge_pages'
+    #     line: 'huge_pages = {{ huge_pages | default("try") }}'
+    #     state: present
+
+    # - name: Set `min_wal_size`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?min_wal_size'
+    #     line: 'min_wal_size = {{ min_wal_size | default("80MB") }}'
+    #     state: present
+    
+    # - name: Set `max_wal_size`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?max_wal_size'
+    #     line: 'max_wal_size = {{ max_wal_size | default("1GB") }}'
+    #     state: present
+
+    # - name: Set `max_worker_processes`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?max_worker_processes'
+    #     line: 'max_worker_processes = {{ max_worker_processes | default("4") }}'
+    #     state: present
+    
+    # - name: Set `max_parallel_workers_per_gather`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?max_parallel_workers_per_gather'
+    #     line: 'max_parallel_workers_per_gather = {{ max_parallel_workers_per_gather | default("2") }}'
+    #     state: present
+
+    # - name: Set `max_parallel_workers`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?max_parallel_workers'
+    #     line: 'max_parallel_workers = {{ max_parallel_workers | default("8") }}'
+    #     state: present
+
+    # - name: Set `max_parallel_maintenance_workers`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?max_parallel_maintenance_workers'
+    #     line: 'max_parallel_maintenance_workers = {{ max_parallel_maintenance_workers | default("2") }}'
+    #     state: present
+
+
+
+
+    - name: Restart Service Postgres
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+
+    - name: wait for postgresql to restart
+      ansible.builtin.wait_for:
+        port: 5432
+        delay: 5
+        timeout: 300
+
+    - name: Install openjdk-11-jre-headless
+      ansible.builtin.apt:
+        name: openjdk-11-jre-headless
+        state: present
+        update_cache: yes
+
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
     - name: Synchronization benchmark of rapsqlbench to remote
@@ -114,11 +251,14 @@
         src: ../benchmark
         dest: /tmp
 
-    - name: Set permissions for synchronized files
-      ansible.builtin.file:
-        path: /tmp/benchmark  
-        mode: "ugo+rwx"       
-        recurse: yes      
+
+
+
+    # - name: Set permissions for synchronized files
+    #   ansible.builtin.file:
+    #     path: /tmp/benchmark  
+    #     mode: "ugo+rwx"       
+    #     recurse: yes      
 
     # - name: Elevate user `postgres` to sudo
     #   ansible.builtin.shell: usermod -aG sudo postgres
@@ -126,29 +266,29 @@
 
 
 
-- hosts: all
-  user: ubuntu
-  become: yes
-  become_user: root
-  tasks:
+# - hosts: all
+#   user: ubuntu
+#   become: yes
+#   become_user: root
+#   tasks:
 
-    # REQUIRES PSYCOPG2!
-    - name: Configure PostgreSQL `shared_buffers`
-      community.postgresql.postgresql_set:
-        name: shared_buffers
-        value: 10GB
-      register: set
+#     # REQUIRES PSYCOPG2!
+#     - name: Configure PostgreSQL `shared_buffers`
+#       community.postgresql.postgresql_set:
+#         name: shared_buffers
+#         value: 10GB
+#       register: set
 
-    - name: Show PostgreSQL `shared_buffers` configuration
-      ansible.builtin.debug:
-        msg: "{{ set.name }} {{ set.prev_val_pretty }} >> {{ set.value_pretty }} restart_req: {{ set.restart_required }}"
-      when: set.changed
+#     - name: Show PostgreSQL `shared_buffers` configuration
+#       ansible.builtin.debug:
+#         msg: "{{ set.name }} {{ set.prev_val_pretty }} >> {{ set.value_pretty }} restart_req: {{ set.restart_required }}"
+#       when: set.changed
 
 
-    # - name: Perform RAPSQLBench 
-    #   ansible.builtin.shell: 
-    #     cmd: ./rapsqlbench.sh -g sp10000 -t 10000 -m 250000 -c 32 -i 1
-    #     chdir: /tmp/benchmark    
+    - name: Perform RAPSQLBench 
+      ansible.builtin.shell: 
+        cmd: ./rapsqlbench.sh -g sp50k5 -t 50000 -m 250000 -c 32 -i 1
+        chdir: /tmp/benchmark    
 
 
 

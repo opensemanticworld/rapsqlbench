@@ -9,7 +9,7 @@ sql_files=$(find "$sql_dir" -name "*.sql")
 # Loop through each .sql file and execute it in the background
 for file in $sql_files; do
    # Execute all .sql files in the background
-  psql -q -U postgres -d postgres -f "$file" >> "$measurement_file" &
+  sudo -u postgres psql -q -U postgres -d postgres -f "$file" >> "$measurement_file" &
   # psql -q -U postgres -d postgres -f "$file" >> "$measurement_file" || exit 1
 done
 

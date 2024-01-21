@@ -95,7 +95,7 @@ for ((i=1; i<=iterations; i++)) do
     # echo "cypher_file: $cypher_file"
     
     # run psql exec and save responses to file
-    psql -U postgres -d postgres -f "$cypher_dir/$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
+    sudo -u postgres psql -U postgres -d postgres -f "$cypher_dir/$cypher_file_name.sql" > "$cypher_responses_file" 2>&1
 
     end_ts=$(get_ts)
     echo "$log_msg, END, $end_ts"

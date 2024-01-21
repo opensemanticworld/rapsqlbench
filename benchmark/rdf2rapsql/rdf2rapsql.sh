@@ -81,7 +81,7 @@ import_dir="$data_dir"/"import"
 init_sql="$import_dir"/init.sql
 ensure_path "$init_sql"
 # Init rapsql graph using init.sql
-psql -q -U postgres -d postgres -f "$init_sql" > "$rapsql_txt" || exit 1
+sudo -u postgres psql -q -U postgres -d postgres -f "$init_sql" > "$rapsql_txt" || exit 1
 
 
 # Created node sql files
