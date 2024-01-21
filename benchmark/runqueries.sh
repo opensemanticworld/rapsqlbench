@@ -33,7 +33,7 @@ penalize_query() {
       # query name is the filename
       local penalty="3600000.000 ms"
       query=$(basename "$file" .txt).sql
-      echo "QUERY | loop-$loop_cnt | $query, PENALTY, $penalty"
+      echo "QUERY-PENALTY | loop-$loop_cnt | $query, PENALTY-TIME, $penalty"
       # make penalty dir in cypher_dir
       timeouts_dir="$cypher_dir/penalty/loop-$loop_cnt"
       mkdir -p "$timeouts_dir"
