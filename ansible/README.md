@@ -131,6 +131,10 @@ tail -f -n +1 /mnt/benchmark/measurement/sp1bil/measurement.csv
 ansible-playbook -i ./inventory/VMNAME-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
 # e.g. 
 ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+ansible-playbook -i ./inventory/vm250k-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+ansible-playbook -i ./inventory/vm5m-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+ansible-playbook -i ./inventory/vm25m-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
 ```
 
 ### Monitor measurment file

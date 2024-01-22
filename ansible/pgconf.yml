@@ -1,6 +1,6 @@
 ########## RAPSQLbench config ##########
-graphname: sp1m
-triples: 1000000
+graphname: sp5m
+triples: 5000000
 memory: 250000
 cores: 32
 iterations: 3
