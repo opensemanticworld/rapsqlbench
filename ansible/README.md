@@ -150,5 +150,8 @@ ssh ubuntu@3.66.144.155
 # general (dynamic graph name)
 tail -f -n +1 /tmp/benchmark/measurement/GRAPH_NAME/measurement.csv
 # e.g. 
-tail -f -n +1 /tmp/benchmark/measurement/sp50k6/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp50k/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp250k/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp1m/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp5m/measurement.csv
 ```

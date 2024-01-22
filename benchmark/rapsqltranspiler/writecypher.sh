@@ -7,8 +7,8 @@ query_dir=$2
 # version="v0.1.1-rdfid"
 # version="v0.1.2-L2L-L2R"
 # version="v0.1.3-L2L"
-# version="v0.2.0-rdfid"
-version="v0.2.1-rdfid"
+version="v0.2.0-rdfid" # l2l cpo only
+# version="v0.2.1-rdfid" # l2l and l2r cpo
 manual_version="v1"
 
 ### Paths ###
