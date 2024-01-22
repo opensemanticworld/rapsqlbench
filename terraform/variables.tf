@@ -54,16 +54,21 @@ variable "vm_map" {
   }))
   default = {
     # TODO: SET RIGHT AMI AND EBS SIZE
-    # "vmtest2" = {
+    # "vmtest" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "t2.micro"
     #   ebs_size      = 30
     # }
-    "vm50k" = {
+    "vm100" = {
       ami           = "ami-04e601abe3e1a910f"
       instance_type = "r5.8xlarge"
-      ebs_size      = 200
+      ebs_size      = 30
     }
+    # "vm50k" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 200
+    # }
     # "vm250k" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
