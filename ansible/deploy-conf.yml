@@ -247,11 +247,6 @@
         port: 5432
         delay: 5
         timeout: 300
-
-    - name: Copy postgresql.conf to `measurement` dir
-      ansible.builtin.copy:
-        src: /etc/postgresql/15/main/postgresql.conf
-        dest: /tmp/benchmark/measurement/{{ graphname }}/postgresql.conf
 # End: POSTGRES CONFIGURATION
 
 
@@ -272,6 +267,11 @@
       ansible.builtin.shell: 
         cmd: ./rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
+    
+    - name: Copy postgresql.conf to `measurement` dir
+      ansible.builtin.copy:
+        src: /etc/postgresql/15/main/postgresql.conf
+        dest: /tmp/benchmark/measurement/{{ graphname }}/postgresql.conf
 # End: RAPSQLBench
 
 
