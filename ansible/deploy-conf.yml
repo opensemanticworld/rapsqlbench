@@ -117,13 +117,6 @@
         line: 'statement_timeout = {{ statement_timeout | default("0") }}'
         state: present
 
-    - name: Set `max_connections` 
-      lineinfile:
-        path: /etc/postgresql/15/main/postgresql.conf
-        regex: '^#?max_connections'
-        line: 'max_connections = {{ max_connections | default("100") }}'
-        state: present
-
     - name: Set `shared_buffers` 
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
@@ -138,19 +131,26 @@
         line: 'effective_cache_size = {{ effective_cache_size | default("4GB") }}'
         state: present
 
-    - name: Set `work_mem` 
-      lineinfile:
-        path: /etc/postgresql/15/main/postgresql.conf
-        regex: '^#?work_mem'
-        line: 'work_mem = {{ work_mem | default("4MB") }}'
-        state: present
+    # - name: Set `max_connections` 
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?max_connections'
+    #     line: 'max_connections = {{ max_connections | default("100") }}'
+    #     state: present
+
+    # - name: Set `work_mem` 
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?work_mem'
+    #     line: 'work_mem = {{ work_mem | default("4MB") }}'
+    #     state: present
     
-    - name: Set `maintenance_work_mem`
-      lineinfile:
-        path: /etc/postgresql/15/main/postgresql.conf
-        regex: '^#?maintenance_work_mem'
-        line: 'maintenance_work_mem = {{ maintenance_work_mem | default("64MB") }}'
-        state: present
+    # - name: Set `maintenance_work_mem`
+    #   lineinfile:
+    #     path: /etc/postgresql/15/main/postgresql.conf
+    #     regex: '^#?maintenance_work_mem'
+    #     line: 'maintenance_work_mem = {{ maintenance_work_mem | default("64MB") }}'
+    #     state: present
     
     # - name: Set `checkpoint_completion_target`
     #   lineinfile:
@@ -273,6 +273,11 @@
         cmd: ./rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
 # End: RAPSQLBench
+
+
+
+
+
 
 
 
