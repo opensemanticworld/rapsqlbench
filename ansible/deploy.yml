@@ -56,13 +56,13 @@
         cmd: echo deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main | sudo tee /etc/apt/sources.list.d/postgresql.list
       when: not pg_15.stat.exists
 
-    - name: Install PostgreSQL 15
+    - name: Install PostgreSQL {{ postgres_apt_version }}
       ansible.builtin.apt:
         name:
-          - postgresql-15
-          - postgresql-client-15
-          - postgresql-server-dev-15
-          # - postgresql-contrib-15
+          - postgresql-{{ postgres_apt_version }}
+          - postgresql-client-{{ postgres_apt_version }}
+          - postgresql-server-dev-{{ postgres_apt_version }}
+          # - postgresql-contrib-{{ postgres_apt_version }}
         state: present
         update_cache: yes
 
@@ -77,11 +77,11 @@
         state: present
         update_cache: yes
 
-    - name: Clone Apache AGE repository from branch release/PG15/1.5.0
+    - name: Clone Apache AGE repository from branch {{ apache_age_git_version }}
       ansible.builtin.git:
         repo: https://github.com/apache/age.git
         dest: /tmp/age
-        version: release/PG15/1.5.0
+        version: "{{ apache_age_git_version }}"
 
     - name: Check if Apache AGE is installed
       ansible.builtin.stat:
@@ -261,13 +261,13 @@
 
     - name: Perform RAPSQLBench 
       ansible.builtin.shell: 
-        cmd: ./rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
+        cmd: ./rapsqlbench.sh -g {{ graph_name }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
     
     - name: Copy postgresql.conf to `measurement` dir
       ansible.builtin.copy:
         src: /etc/postgresql/15/main/postgresql.conf
-        dest: /tmp/benchmark/measurement/{{ graphname }}/postgresql.conf
+        dest: /tmp/benchmark/measurement/{{ graph_name }}/postgresql.conf
         remote_src: true
       become: true 
       become_user: root

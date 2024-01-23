@@ -1,35 +1,40 @@
-####################### RAPSQLbench config #######################
+########################## RAPSQLBench CONFIG ##########################
+# Author(s): 
+  # Andreas Räder (https://github.com/raederan)
 
-### Database interoperability config ###
+
+### Database Installation config ##############################
+postgres_apt_version: 15
+apache_age_git_version: release/PG15/1.5.0
+
+
+### Database interoperability config ##########################
+graph_name: sp100
+
 # Model options [gdm]: 
-#     yars | rdfid
-# Transpiler options [gdm]: 
-#     plain | cpo1 (L2L) | cpo2 (L2R) | cpo3 (L2L+L2R) | man
-rapsqlmodel: yars
-rapsqltranspiler: plain
-graphname: sp50k
+  # yars | rdfid
+rapsql_model: yars
 
-### Benchmark metrics config ###
+# Transpiler options [gdm]: 
+  # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) | man
+rapsql_transpiler: plain
+
+
+### Benchmark metrics config ##################################
 triples: 50000
 memory: 250000
 cores: 32
 iterations: 1
 
 
-####################### PostgreSQL config #######################
+### PostgreSQL config #########################################
 statement_timeout: 1min
-
-### Config Options  ###
-# true:=  apply postgres performance config
-# false:= apply postgres default config
-performance_conf: false
-### Parameters ###
-shared_buffers: 64GB
-effective_cache_size: 192GB
+# shared_buffers: 64GB
+# effective_cache_size: 192GB
 
 
 
-##### OPTIONS NEED TO BE ADDED IN `deploy-conf.yml` FIRST #####
+##### MORE OPTIONS NEED TO BE ADDED IN `deploy.yml` FIRST #####
 # max_connections: 32
 # work_mem: 32MB
 # maintenance_work_mem: 1GB

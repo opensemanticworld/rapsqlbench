@@ -21,7 +21,6 @@ ansible/*.yml
 ansible/POSTGRES.md
 ansible/PERFORMANCE.md
 !ansible/deploy.yml
-!ansible/deploy-conf.yml
 !ansible/config.yml
 !ansible/pgconf.yml
 rapsql-docker/*
