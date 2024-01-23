@@ -93,6 +93,7 @@ $exectime_sh "SP2B" "$sp2b_start" "$sp2b_end"
 ### RDF2RAPSQL ###
 # Input: spX.n3
 # Target: rapsql database
+echo_tee "RDF2RAPSQL, RAPSQLMODEL, $model"
 rdf2rapsql_start=$(get_ts)
 echo_tee "RDF2RAPSQL, START, $rdf2rapsql_start"
 # Run rdf2rapsql
@@ -106,6 +107,7 @@ echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
 
 ### PROVIDE CYPHER ###
 # Input: graphname, query_dir
+# echo_tee "WRITECYPHER, RAPSQLTRANSPILER, $transpiler"
 writecypher_start=$(get_ts)
 echo_tee "WRITECYPHER, START, $writecypher_start"
 # if transpiler is not equal to "mano" then writecypher else use only manual queries
