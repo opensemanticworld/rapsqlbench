@@ -8,7 +8,7 @@ postgres_apt_version: 15
 apache_age_git_version: release/PG15/1.5.0
 
 ### Database interoperability config ##########################
-graph_name: sp100t
+graph_name: sp100
 
 # Model options [gdm]: 
 # yars | rdfid
@@ -19,15 +19,16 @@ rdf2pg_model: yars
 rapsql_transpiler: plain
 
 ### Benchmark metrics config ##################################
-triples: 50000
-memory: 250000
-cores: 32
+perform_benchmark: false
+triples: 100
+memory: 500
+cores: 1
 iterations: 1
 
 ### Benchmark fetch results config ############################
 # Fetch results after benchmark execution (!data can be huge)
 fetch_measurement: true
-fetech_queries: true
+fetch_queries: true
 fetch_data: true
 
 ### PostgreSQL config #########################################

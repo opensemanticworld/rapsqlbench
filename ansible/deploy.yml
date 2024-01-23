@@ -105,6 +105,13 @@
 
 
 # Begin: POSTGRES CONFIGURATION
+- name: POSTGRES CONFIGURATION
+  hosts: all
+  gather_facts: false
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
     - name: Set `statement_timeout` 
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
@@ -279,12 +286,14 @@
       ansible.builtin.shell: 
         cmd: ./rapsqlbench.sh -g {{ graph_name }} -l {{ rdf2pg_model }} -r {{ rapsql_transpiler }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
+      when: perform_benchmark
     
     - name: Copy postgresql.conf to `measurement` dir
       ansible.builtin.copy:
         src: /etc/postgresql/15/main/postgresql.conf
         dest: /tmp/benchmark/measurement/{{ graph_name }}/postgresql.conf
         remote_src: true
+        force: yes
       become: true 
       become_user: root
 # End: RAPSQLBench
@@ -302,7 +311,7 @@
         dest: ../results/measurement
         mode: pull
         delete: no
-      when: fetch_measurement == true
+      when: fetch_measurement 
 
     - name: Synchronize queries from remote
       ansible.posix.synchronize:
@@ -310,7 +319,7 @@
         dest: ../results/queries
         mode: pull
         delete: no
-      when: fetch_queries == true
+      when: fetch_queries
     
     - name: Synchronize data from remote
       ansible.posix.synchronize:
@@ -318,6 +327,5 @@
         dest: ../results/data
         mode: pull
         delete: no
-      when: fetch_data == true
-    
+      when: fetch_data
 # End: Fetch Results
