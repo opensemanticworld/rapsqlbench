@@ -45,28 +45,9 @@ match_model_option() {
 # Function to check if rapsqltranspiler option is valid 
 match_transpiler_option() {
   local transpiler=$1
-  if ! [[ $transpiler =~ ^(yplain|ycpo1|ycpo2|ycpo3|ymano|rplain|rcpo1|rcpo2|rcpo3|rmano)$ ]]; then
+  if ! [[ $transpiler =~ ^(plain|cpo1|cpo2|cpo3|mano)$ ]]; then
     echo "ERROR: Invalid transpiler arg, must be either Xplain, Xcpo1, Xcpo2, Xcpo3, Xmano with X = y or r."
     exit 1
-  fi
-}
-
-# Function to check if model and transpiler combination is valid 
-# yars:   yplain | ycpo1 (=L2L) | ycpo2 (=L2R) | ycpo3 (=L2L+L2R) | ymano
-# rdfid:  rplain | rcpo1 (=L2L) | rcpo2 (=L2R) | rcpo3 (=L2L+L2R) | rmano
-check_model_transpiler_comination () {
-  local model=$1
-  local transpiler=$2
-  if [[ $model == "yars" ]]; then
-    if ! [[ $transpiler =~ ^(yplain|ycpo1|ycpo2|ycpo3|ymano)$ ]]; then
-      echo "ERROR: Invalid arg combination, transpiler must be either yplain, ycpo1, ycpo2, ycpo3, ymano for model yars."
-      exit 1
-    fi
-  elif [[ $model == "rdfid" ]]; then
-    if ! [[ $transpiler =~ ^(rplain|rcpo1|rcpo2|rcpo3|rmano)$ ]]; then
-      echo "ERROR: Invalid arg combination, transpiler must be either rplain, rcpo1, rcpo2, rcpo3, rmano for model rdfid."
-      exit 1
-    fi
   fi
 }
 
@@ -185,9 +166,6 @@ if [[ $triples -gt 1000000000 ]]; then
   fi
 fi
 
-# Check if combination of model and transpiler is valid
-check_model_transpiler_comination "$model" "$transpiler"
-
 # Check if requested cores resources are available
 check_core_resources "$cores"
 
@@ -213,13 +191,20 @@ spx_sh=$basedir/spx.sh
 # echo "iterations: $iterations"
 
 # Valid test commands
-# ./rapsqlbench.sh -g sp2b -l yars -r yplain -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l yars -r ycpo1 -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l rdfid -r rcpo2 -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l rdfid -r rmano -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r plain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r cpo1 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r cpo2 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r mano -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r plain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r cpo1 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r cpo2 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r mano -t 100 -m 1000 -c 1 -i 1
+
 
 # Invalid test commands
 # ./rapsqlbench.sh -g sp2b -l yars -r rplain -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l yarss -r yplain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yarss -r plain -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l yars -r rplains -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l rdfid -r ycpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l srdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1

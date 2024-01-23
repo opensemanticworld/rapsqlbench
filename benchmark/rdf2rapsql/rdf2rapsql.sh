@@ -2,8 +2,9 @@
 
 # Input parameter
 graphname=$1
-memory=$2
-cores=$3
+model=$2
+memory=$3
+cores=$4
 
 # Function to get the current timestamp
 get_ts() {
@@ -29,7 +30,7 @@ measurement_dir=$cwd/measurement/"$graphname"
 
 # File paths
 exectime_sh="$cwd/exectime.sh"
-rdf2pg_jar=$cwd/rdf2pg/rdf2pg.jar
+rdf2pg_jar=$cwd/rdf2pg/$model/rdf2pg.jar
 writesql_sh="$rdf2rapsql_dir/writesql.sh"
 edgepart_sh="$rdf2rapsql_dir/edgepart.sh"
 sqlimport_sh="$rdf2rapsql_dir/sqlimport.sh"

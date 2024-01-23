@@ -2,26 +2,44 @@
 
 graph_name=$1
 query_dir=$2
+model=$3
+transpiler=$4
 
-### rapsqltranspiler version ###
-# version="v0.1.1-rdfid"
-# version="v0.1.2-L2L-L2R"
-# version="v0.1.3-L2L"
-version="v0.2.0-rdfid" # l2l cpo only
-# version="v0.2.1-rdfid" # l2l and l2r cpo
+### Rapsqltranspiler version ###
+# Provide manual written q6 and q7 (unsupported by rapsqltranspiler)
 manual_version="v1"
+# Provide transpiler version 
+# Version grammer: vMAJOR.MINOR.PATCH
+# Major is hardcoded yet
+major=0
+# Model sets minor version
+if [[ $model == "yars" ]]; then
+  minor=3
+elif [[ $model == "rdfid" ]]; then
+  minor=4
+fi
+# Transpiler sets patch version
+if [[ $transpiler == "plain" ]]; then
+  patch=0
+elif [[ $transpiler == "cpo1" ]]; then
+  patch=1
+elif [[ $transpiler == "cpo2" ]]; then
+  patch=2
+elif [[ $transpiler == "cpo3" ]]; then
+  patch=3
+fi
+# Set version
+version="v$major.$minor.$patch"
 
 ### Paths ###
 sparql_dir="$query_dir/sparql"
 cypher_dir="$query_dir/cypher/$graph_name"
-# cypher_dir="$query_dir/cypher/$version/$graph_name"
 dir_path=$(dirname "$(realpath "$0")")
+transpiler_dir="$dir_path/$version-$model-$transpiler"
 q6provider_sh="$dir_path/manual-queries/$manual_version/q6provider.sh"
 q7provider_sh="$dir_path/manual-queries/$manual_version/q7provider.sh"
-rapsqltranspiler_jar="$dir_path/$version/rapsqltranspiler-$version.jar"
+rapsqltranspiler_jar="$transpiler_dir/rapsqltranspiler-$version-jar-with-dependencies.jar"
 
-### Target directory ###
-mkdir -p "$cypher_dir"
 
 ### Create base file for cypher query as sql file ###
 sql_create_basefile() {

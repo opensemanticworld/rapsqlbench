@@ -10,20 +10,19 @@ apache_age_git_version: release/PG15/1.5.0
 
 
 ### Database interoperability config ##########################
-graph_name: sp100t1
+graph_name: sp100t
 
 # Model options [gdm]: 
 # yars | rdfid
 rdf2pg_model: yars
 
-# Transpiler options [gdm, yars(y), rdfid(r)]: 
-# yars:   yplain | ycpo1 (=L2L) | ycpo2 (=L2R) | ycpo3 (=L2L+L2R) | ymano
-# rdfid:  rplain | rcpo1 (=L2L) | rcpo2 (=L2R) | rcpo3 (=L2L+L2R) | rmano
-rapsql_transpiler: yplain
+# Transpiler options [gdm, yars, rdfid]: 
+# plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) | mano
+rapsql_transpiler: plain
 
 
 ### Benchmark metrics config ##################################
-triples: 50000
+triples: 100
 memory: 250000
 cores: 32
 iterations: 1
