@@ -9,14 +9,14 @@ apache_age_git_version: release/PG15/1.5.0
 
 
 ### Database interoperability config ##########################
-graph_name: sp100
+graph_name: sp100t1
 
 # Model options [gdm]: 
   # yars | rdfid
-rapsql_model: yars
+rdf2pg_model: yars
 
 # Transpiler options [gdm]: 
-  # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) | man
+  # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) | mano
 rapsql_transpiler: plain
 
 
