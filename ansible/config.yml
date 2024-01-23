@@ -2,12 +2,10 @@
 # Author(s): 
   # Andreas Räder (https://github.com/raederan)
 
-
 ### Database Installation config ##############################
 # Both versions must be harmonised with each other
 postgres_apt_version: 15
 apache_age_git_version: release/PG15/1.5.0
-
 
 ### Database interoperability config ##########################
 graph_name: sp100t
@@ -20,13 +18,17 @@ rdf2pg_model: yars
 # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) | mano
 rapsql_transpiler: plain
 
-
 ### Benchmark metrics config ##################################
 triples: 50000
 memory: 250000
 cores: 32
 iterations: 1
 
+### Benchmark fetch results config ############################
+# Fetch results after benchmark execution (!data can be huge)
+fetch_measurement: true
+fetech_queries: true
+fetch_data: true
 
 ### PostgreSQL config #########################################
 statement_timeout: 5min

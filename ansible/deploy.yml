@@ -288,3 +288,36 @@
       become: true 
       become_user: root
 # End: RAPSQLBench
+
+# Start: Fetch Results
+- name: FETCH RESULTS
+  hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: Synchronize measurement from remote
+      ansible.posix.synchronize:
+        src: /tmp/benchmark/measurement/
+        dest: ../results/measurement
+        mode: pull
+        delete: no
+      when: fetch_measurement == true
+
+    - name: Synchronize queries from remote
+      ansible.posix.synchronize:
+        src: /tmp/benchmark/queries/cypher/
+        dest: ../results/queries
+        mode: pull
+        delete: no
+      when: fetch_queries == true
+    
+    - name: Synchronize data from remote
+      ansible.posix.synchronize:
+        src: /tmp/benchmark/data/
+        dest: ../results/data
+        mode: pull
+        delete: no
+      when: fetch_data == true
+    
+# End: Fetch Results
