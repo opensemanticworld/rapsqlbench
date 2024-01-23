@@ -1,8 +1,10 @@
-########## RAPSQLbench config ##########
+####################### RAPSQLbench config #######################
 
 ### Database interoperability config ###
-# Model options [gdm]: yars | rdfid
-# Transpiler options [gdm]: plain | cpo1 (L2L) | cpo2 (L2R) | cpo3 (L2L+L2R) | man1
+# Model options [gdm]: 
+#     yars | rdfid
+# Transpiler options [gdm]: 
+#     plain | cpo1 (L2L) | cpo2 (L2R) | cpo3 (L2L+L2R) | man
 rapsqlmodel: yars
 rapsqltranspiler: plain
 graphname: sp50k
@@ -14,8 +16,14 @@ cores: 32
 iterations: 1
 
 
-########## PostgreSQL config ##########
-statement_timeout: 2min
+####################### PostgreSQL config #######################
+statement_timeout: 1min
+
+### Config Options  ###
+# true:=  apply postgres performance config
+# false:= apply postgres default config
+performance_conf: false
+### Parameters ###
 shared_buffers: 64GB
 effective_cache_size: 192GB
 

@@ -61,6 +61,7 @@
         name:
           - postgresql-15
           - postgresql-client-15
+          - postgresql-server-dev-15
           # - postgresql-contrib-15
         state: present
         update_cache: yes
@@ -73,13 +74,6 @@
           - zlib1g-dev
           - flex
           - bison
-        state: present
-        update_cache: yes
-
-    - name: Install necessary headers and libraries for PostgreSQL 15
-      ansible.builtin.apt:
-        name:
-          - postgresql-server-dev-15
         state: present
         update_cache: yes
 
@@ -123,6 +117,7 @@
         regex: '^#?shared_buffers'
         line: 'shared_buffers = {{ shared_buffers | default("128MB") }}'
         state: present
+      when: shared_buffers is defined
 
     - name: Set `effective_cache_size` 
       lineinfile:
@@ -130,6 +125,7 @@
         regex: '^#?effective_cache_size'
         line: 'effective_cache_size = {{ effective_cache_size | default("4GB") }}'
         state: present
+      when: effective_cache_size is defined
 
     # - name: Set `max_connections` 
     #   lineinfile:
