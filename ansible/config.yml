@@ -22,25 +22,21 @@ rapsql_transpiler: plain
 
 
 ### Benchmark metrics config ##################################
-triples: 100
+triples: 50000
 memory: 250000
 cores: 32
 iterations: 1
 
 
 ### PostgreSQL config #########################################
-statement_timeout: 1min
+statement_timeout: 5min
 # shared_buffers: 64GB
 # effective_cache_size: 192GB
-
-
-
-##### MORE OPTIONS NEED TO BE ADDED IN `deploy.yml` FIRST #####
 # max_connections: 32
 # work_mem: 32MB
 # maintenance_work_mem: 1GB
 # checkpoint_completion_target: 0.9
-# wal_buffers: 16MB
+# wal_buffers: 16MB   # -1 = based on shared_buffers
 # default_statistics_target: 100
 # random_page_cost: 1.1
 # effective_io_concurrency: 200

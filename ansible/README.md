@@ -124,17 +124,18 @@ tail -f -n +1 /mnt/benchmark/measurement/sp1bil/measurement.csv
 
 1. Login to AWS CLI via `aws configure sso` and your credentials.
 2. Build the desired infrastructure using Terraform via `main.tf` and setup `variables.tf`, e.g. navigate to terraform directory `cd terraform` and run `terraform apply`.
-3. Perform benchmark using Ansible via `deploy-conf.yml` and Posgres setup via `pgconf.yml`, e.g. with vm for 50k triple dataset `vm50k` from `terraform` directory`:
+3. Perform benchmark using Ansible via `deploy.yml` and Posgres setup via `config.yml`, e.g. with vm for 50k triple dataset `vm50k` from `terraform` directory`:
 
 ```bash
 # general (dynamic vm name)
-ansible-playbook -i ./inventory/VMNAME-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+ansible-playbook -i ./inventory/VMNAME-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
 # e.g. 
-ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
-ansible-playbook -i ./inventory/vm250k-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
-ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
-ansible-playbook -i ./inventory/vm5m-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
-ansible-playbook -i ./inventory/vm25m-eip.txt ../ansible/deploy-conf.yml -e "@../ansible/pgconf.yml"
+ansible-playbook -i ./inventory/vm100-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm250k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm5m-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm25m-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
 ```
 
 ### Monitor measurment file
