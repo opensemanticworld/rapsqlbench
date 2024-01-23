@@ -9,6 +9,8 @@
   - [Perform a benchmark](#perform-a-benchmark)
     - [Start the benchmark](#start-the-benchmark)
     - [Monitor measurment files](#monitor-measurment-files)
+  - [RAPSQLBench v2](#rapsqlbench-v2)
+    - [Monitor measurment file](#monitor-measurment-file)
 
 ## Prerequisites
 
@@ -116,4 +118,41 @@ tail -f -n +1 /mnt/benchmark/measurement/sp125m/measurement.csv
 tail -f -n +1 /mnt/benchmark/measurement/sp250m/measurement.csv
 tail -f -n +1 /mnt/benchmark/measurement/sp500m/measurement.csv
 tail -f -n +1 /mnt/benchmark/measurement/sp1bil/measurement.csv
+```
+
+## RAPSQLBench v2
+
+1. Login to AWS CLI via `aws configure sso` and your credentials.
+2. Build the desired infrastructure using Terraform via `main.tf` and setup `variables.tf`, e.g. navigate to terraform directory `cd terraform` and run `terraform apply`.
+3. Perform benchmark using Ansible via `deploy.yml` and Posgres setup via `config.yml`, e.g. with vm for 50k triple dataset `vm50k` from `terraform` directory`:
+
+```bash
+# general (dynamic vm name)
+ansible-playbook -i ./inventory/VMNAME-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+# e.g. 
+ansible-playbook -i ./inventory/vm100-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm250k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm1m-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm5m-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+ansible-playbook -i ./inventory/vm25m-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
+```
+
+### Monitor measurment file
+
+```bash
+# general (dynamic ip)
+ssh ubuntu@INVENTORY_IP_TXT
+# e.g. 
+ssh ubuntu@3.66.144.155
+```
+
+```bash
+# general (dynamic graph name)
+tail -f -n +1 /tmp/benchmark/measurement/GRAPH_NAME/measurement.csv
+# e.g. 
+tail -f -n +1 /tmp/benchmark/measurement/sp50k/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp250k/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp1m/measurement.csv
+tail -f -n +1 /tmp/benchmark/measurement/sp5m/measurement.csv
 ```

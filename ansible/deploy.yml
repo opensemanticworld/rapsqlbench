@@ -1,5 +1,6 @@
 # Begin: Prerequisites
-- hosts: all
+- name: PREREQUISITES
+  hosts: all
   gather_facts: false
   user: ubuntu
   become: yes
@@ -23,208 +24,300 @@
 # End: Prerequisites
 
 
-# Begin: Install Software
-- hosts: all
+# Begin: Provide Software
+- name:  PROVIDE SOFTWARE
+  hosts: all
   user: ubuntu
   become: yes
   become_user: root
   tasks:
-    # - name: Create an ext4 filesystem on /dev/nvme1n1
-    #   community.general.filesystem:
-    #     fstype: ext4
-    #     state: present
-    #     dev: /dev/nvme1n1
-
-    # - name: Fetch the UUID of /dev/nvme1n1
-    #   command: blkid -s UUID -o value /dev/nvme1n1
-    #   changed_when: false
-    #   register: blkid_out
-
-    # - name: Mount /dev/nvme1n1 by UUID
-    #   ansible.posix.mount:
-    #     path: /mnt
-    #     src: UUID={{ blkid_out.stdout }}
-    #     fstype: ext4
-    #     opts: defaults
-    #     state: mounted
-
-    # - name: Resize disk of /dev/nvme1n1
-    #   filesystem:
-    #     fstype: ext4
-    #     dev: /dev/nvme1n1
-    #     resizefs: yes
-
-    # deprecated warning is a bug
-    # https://github.com/ansible-collections/ansible.posix/issues/468
-    - name: Synchronization benchmark of rapsqlbench to remote
-      ansible.posix.synchronize:
-        src: ../benchmark
-        dest: /mnt
-
-    - name: Synchronization rapsql-docker of rapsqlbench to remote
-      ansible.posix.synchronize:
-        src: ../rapsql-docker
-        dest: /mnt
-
-    - name: Install required packages ca-certificates, curl, gnupg
-      apt:
+    - name: Install initial packages
+      ansible.builtin.apt:
         name:
-          - ca-certificates
+          - dirmngr 
+          - ca-certificates 
+          - software-properties-common 
+          - apt-transport-https 
+          - lsb-release 
           - curl
-          - gnupg
         state: present
-
-    - name: Check if Docker's official GPG key exists
-      ansible.builtin.stat:
-        path: /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
-      register: gpg_check
-
-    - name: Add Docker's official GPG key
-      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
-      when: not gpg_check.stat.exists
-
-    - name: Add Docker repository
-      apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-        state: present
-      when: not gpg_check.stat.exists
-
-    - name: Install Docker packages
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose
         update_cache: yes
 
-    - name: Add user to the 'docker' group
-      user:
-        name: ubuntu
-        groups: docker
-      tags: docker
+    - name: Check if PostgreSQL 15 is installed
+      ansible.builtin.stat:
+        path: /usr/lib/postgresql/15/bin/postgres
+      register: pg_15
 
-# # Begin: Change Docker Storage Location
-# - hosts: all
-#   user: ubuntu
-#   become: yes
-#   become_user: root
-#   tasks:
-#     # check if the new docker storage location exists
-#     - name: Check if desired docker storage location exists
-#       ansible.builtin.stat:
-#         path: /mnt/docker/
-#       register: dir_check
-#       tags: docker
+    - name: Import PostgreSQL 15 APT Repository 
+      ansible.builtin.shell:
+        cmd: curl -fSsL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql.gpg > /dev/null
+      when: not pg_15.stat.exists
 
-#     - name: Create docker storage location if not exists
-#       ansible.builtin.file:
-#         path: /mnt/docker
-#         state: directory
-#       tags: docker
-#         # mode: '0755'
+    - name: Import PostgreSQL 15 stable APT repository
+      ansible.builtin.shell:
+        cmd: echo deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main | sudo tee /etc/apt/sources.list.d/postgresql.list
+      when: not pg_15.stat.exists
 
-#     - name: Stop docker service
-#       ansible.builtin.systemd:
-#         state: stopped
-#         name: docker
-#       tags: docker
-#       when: not dir_check.stat.exists
+    - name: Install PostgreSQL {{ postgres_apt_version }}
+      ansible.builtin.apt:
+        name:
+          - postgresql-{{ postgres_apt_version }}
+          - postgresql-client-{{ postgres_apt_version }}
+          - postgresql-server-dev-{{ postgres_apt_version }}
+          # - postgresql-contrib-{{ postgres_apt_version }}
+        state: present
+        update_cache: yes
 
-#     - name: Copy docker data to new location
-#       ansible.builtin.shell: rsync -aP /var/lib/docker/ /mnt/docker
-#       tags: docker
-#       when: not dir_check.stat.exists
+    - name: Install required packages for Apache AGE
+      ansible.builtin.apt:
+        name:
+          - build-essential
+          - libreadline-dev
+          - zlib1g-dev
+          - flex
+          - bison
+        state: present
+        update_cache: yes
 
-#     - name: Change docker storage location
-#       ansible.builtin.lineinfile:
-#         path: /lib/systemd/system/docker.service
-#         regexp: '^ExecStart='
-#         line: ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --data-root /mnt/docker
-#       tags: docker
-#       when: not dir_check.stat.exists
+    - name: Clone Apache AGE repository from branch {{ apache_age_git_version }}
+      ansible.builtin.git:
+        repo: https://github.com/apache/age.git
+        dest: /tmp/age
+        version: "{{ apache_age_git_version }}"
 
-#     - name: Start docker with reloaded daemon
-#       ansible.builtin.systemd:
-#         daemon_reload: true
-#         state: started
-#         name: docker
-#       tags: docker
-#       when: not dir_check.stat.exists
-# # End: Change Docker Storage Location
+    - name: Check if Apache AGE is installed
+      ansible.builtin.stat:
+        path: /usr/share/postgresql/15/extension/age.control
+      register: age
+
+    - name: Install Apache AGE 
+      ansible.builtin.shell: make install
+      args:
+        chdir: /tmp/age
+      when: not age.stat.exists
+
+    - name: Install openjdk-11-jre-headless
+      ansible.builtin.apt:
+        name: openjdk-11-jre-headless
+        state: present
+        update_cache: yes
+# End: Provide Software
 
 
-# Start: Perform rapsql benchmark
-- hosts: all
+# Begin: POSTGRES CONFIGURATION
+    - name: Set `statement_timeout` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?statement_timeout'
+        line: 'statement_timeout = {{ statement_timeout | default("0") }}'
+        state: present
+
+    - name: Set `shared_buffers` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?shared_buffers'
+        line: 'shared_buffers = {{ shared_buffers | default("128MB") }}'
+        state: present
+      when: shared_buffers is defined
+
+    - name: Set `effective_cache_size` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?effective_cache_size'
+        line: 'effective_cache_size = {{ effective_cache_size | default("4GB") }}'
+        state: present
+      when: effective_cache_size is defined
+
+    - name: Set `max_connections` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_connections'
+        line: 'max_connections = {{ max_connections | default("100") }}'
+        state: present
+      when: max_connections is defined
+
+    - name: Set `work_mem` 
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?work_mem'
+        line: 'work_mem = {{ work_mem | default("4MB") }}'
+        state: present
+      when: work_mem is defined
+    
+    - name: Set `maintenance_work_mem`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?maintenance_work_mem'
+        line: 'maintenance_work_mem = {{ maintenance_work_mem | default("64MB") }}'
+        state: present
+      when: maintenance_work_mem is defined
+    
+    - name: Set `checkpoint_completion_target`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?checkpoint_completion_target'
+        line: 'checkpoint_completion_target = {{ checkpoint_completion_target | default("0.9") }}'
+        state: present
+      when: checkpoint_completion_target is defined
+
+    - name: Set `wal_buffers`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?wal_buffers'
+        line: 'wal_buffers = {{ wal_buffers | default("-1") }}' 
+        state: present
+      when: wal_buffers is defined
+    
+    - name: Set `default_statistics_target`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?default_statistics_target'
+        line: 'default_statistics_target = {{ default_statistics_target | default("100") }}'
+        state: present
+      when: default_statistics_target is defined
+    
+    - name: Set `random_page_cost`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?random_page_cost'
+        line: 'random_page_cost = {{ random_page_cost | default("4.0") }}'
+        state: present
+      when: random_page_cost is defined
+
+    - name: Set `effective_io_concurrency`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?effective_io_concurrency'
+        line: 'effective_io_concurrency = {{ effective_io_concurrency | default("1") }}'
+        state: present
+      when: effective_io_concurrency is defined
+    
+    - name: Set `huge_pages`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?huge_pages'
+        line: 'huge_pages = {{ huge_pages | default("try") }}'
+        state: present
+      when: huge_pages is defined
+
+    - name: Set `min_wal_size`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?min_wal_size'
+        line: 'min_wal_size = {{ min_wal_size | default("80MB") }}'
+        state: present
+      when: min_wal_size is defined
+    
+    - name: Set `max_wal_size`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_wal_size'
+        line: 'max_wal_size = {{ max_wal_size | default("1GB") }}'
+        state: present
+      when: max_wal_size is defined
+
+    - name: Set `max_worker_processes`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_worker_processes'
+        line: 'max_worker_processes = {{ max_worker_processes | default("4") }}'
+        state: present
+      when: max_worker_processes is defined
+    
+    - name: Set `max_parallel_workers_per_gather`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_parallel_workers_per_gather'
+        line: 'max_parallel_workers_per_gather = {{ max_parallel_workers_per_gather | default("2") }}'
+        state: present
+      when: max_parallel_workers_per_gather is defined
+
+    - name: Set `max_parallel_workers`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_parallel_workers'
+        line: 'max_parallel_workers = {{ max_parallel_workers | default("8") }}'
+        state: present
+      when: max_parallel_workers is defined
+
+    - name: Set `max_parallel_maintenance_workers`
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regex: '^#?max_parallel_maintenance_workers'
+        line: 'max_parallel_maintenance_workers = {{ max_parallel_maintenance_workers | default("2") }}'
+        state: present
+      when: max_parallel_maintenance_workers is defined
+
+    - name: Restart Service Postgres
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+    - name: Wait for Postgres to restart
+      ansible.builtin.wait_for:
+        port: 5432
+        delay: 5
+        timeout: 300
+# End: POSTGRES CONFIGURATION
+
+
+# Begin: RAPSQLBench
+- name: RAPSQLBENCH
+  hosts: all
   user: ubuntu
   become: yes
   become_user: root
   tasks:
-    - name: Deploy rapsql database
-      community.docker.docker_compose:
-        project_src: /mnt/rapsql-docker 
-        project_name: rapsqlbench
-        build: no
-        pull: yes
-      register: rapsqldb
+    # deprecated warning is a bug
+    # https://github.com/ansible-collections/ansible.posix/issues/468
+    - name: Synchronize `benchmark` dir of rapsqlbench to remote `tmp` dir
+      ansible.posix.synchronize:
+        src: ../benchmark
+        dest: /tmp
 
-    # - name: Show rapsqldb results
-    #   ansible.builtin.debug:
-    #     var: rapsqldb
+    - name: Perform RAPSQLBench 
+      ansible.builtin.shell: 
+        cmd: ./rapsqlbench.sh -g {{ graph_name }} -l {{ rdf2pg_model }} -r {{ rapsql_transpiler }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
+        chdir: /tmp/benchmark    
     
-    - name: Verify rapsqldb is running
-      ansible.builtin.assert:
-        that: 
-          - "rapsqldb.services.rapsql.rapsqlcontainer.state.running"
+    - name: Copy postgresql.conf to `measurement` dir
+      ansible.builtin.copy:
+        src: /etc/postgresql/15/main/postgresql.conf
+        dest: /tmp/benchmark/measurement/{{ graph_name }}/postgresql.conf
+        remote_src: true
+      become: true 
+      become_user: root
+# End: RAPSQLBench
 
-# INSERT WAITING TIME!!!
-    - name: Sleep for 60 seconds and continue with play
-      ansible.builtin.wait_for:
-        timeout: 60
-      delegate_to: localhost
+# Start: Fetch Results
+- name: FETCH RESULTS
+  hosts: all
+  user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: Synchronize measurement from remote
+      ansible.posix.synchronize:
+        src: /tmp/benchmark/measurement/
+        dest: ../results/measurement
+        mode: pull
+        delete: no
+      when: fetch_measurement == true
 
-    - name: Perform rapsql benchmark by input triple value
-      community.docker.docker_container_exec:
-        container: rapsqlcontainer
-        # command: /bin/bash rapsqlbench.sh -g {{ graphname }} -t {{ triples }} -m {{ mem }} -c {{ cores }} -i {{ iter }}
-        command: /bin/bash rapsqlbench.sh -g {{ g }} -t {{ t }} -m 250000 -c 32 -i {{ i }}
-        chdir: /mnt
-      register: rapsqlbench
-      
-    # - name: Show rapsqlbench results
-    #   ansible.builtin.debug:
-    #     var: rapsqlbench
-
-
-# End: Perform rapsql benchmark
-
-
-## Start: Fetch Results
-# - hosts: all
-#   user: ubuntu
-#   become: yes
-#   become_user: root
-#   tasks:
-    # - name: Synchronize measurement from remote
-    #   ansible.posix.synchronize:
-    #     src: /mnt/benchmark/measurement/
-    #     dest: ../results/aws/{{ version }}/measurement
-    #     mode: pull
-    #     delete: no
-
-    # - name: Synchronize queries from remote
-    #   ansible.posix.synchronize:
-    #     src: /mnt/benchmark/queries/cypher/
-    #     dest: ../results/aws/{{ version }}/queries
-    #     mode: pull
-    #     delete: no
+    - name: Synchronize queries from remote
+      ansible.posix.synchronize:
+        src: /tmp/benchmark/queries/cypher/
+        dest: ../results/queries
+        mode: pull
+        delete: no
+      when: fetch_queries == true
     
-    # - name: Synchronize data from remote
-    #   ansible.posix.synchronize:
-    #     src: /mnt/benchmark/data/
-    #     dest: ../results/aws/{{ version }}/data
-    #     mode: pull
-    #     delete: no    
+    - name: Synchronize data from remote
+      ansible.posix.synchronize:
+        src: /tmp/benchmark/data/
+        dest: ../results/data
+        mode: pull
+        delete: no
+      when: fetch_data == true
     
-## End: Fetch Results
+# End: Fetch Results

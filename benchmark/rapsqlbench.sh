@@ -10,7 +10,8 @@ match_graphname_pattern() {
     echo "ERROR: $graphname contains special characters or begins with digits."
     exit 1
   fi
-  # # Grammer graph name
+}
+  # # Grammer graph name (experimental)
   # # 1 names beginning with pg_ or ag_ are reserved for system schemas
   # # 2 no white spaces
   # # 3 no special characters
@@ -30,6 +31,24 @@ match_graphname_pattern() {
   # else
   #   echo "YPG2RAPSQL, GRAPH, $graph_name"
   # fi
+
+
+# Function to check if rdf2pg model option is valid
+match_model_option() {
+  local model=$1
+  if ! [[ $model =~ ^(yars|rdfid)$ ]]; then
+    echo "ERROR: Invalid model arg, must be either yars or rdfid."
+    exit 1
+  fi
+}
+
+# Function to check if rapsqltranspiler option is valid 
+match_transpiler_option() {
+  local transpiler=$1
+  if ! [[ $transpiler =~ ^(plain|cpo1|cpo2|cpo3|mano)$ ]]; then
+    echo "ERROR: Invalid transpiler arg, must be either Xplain, Xcpo1, Xcpo2, Xcpo3, Xmano with X = y or r."
+    exit 1
+  fi
 }
 
 # Function to check if a value is a positive integer
@@ -63,11 +82,21 @@ check_memory_resources() {
 }
 
 # Parse command line arguments
-while getopts ":g:t:m:c:i:" opt; do
+while getopts ":g:l:r:t:m:c:i:" opt; do
   case $opt in
     g)
       if match_graphname_pattern "$OPTARG"; then
         graphname=$OPTARG
+      fi
+      ;;
+    l)
+      if match_model_option "$OPTARG"; then
+        model=$OPTARG
+      fi
+      ;;
+    r)
+      if match_transpiler_option "$OPTARG"; then
+        transpiler=$OPTARG
       fi
       ;;
     t)
@@ -107,6 +136,7 @@ if [[ -z "$graphname" ]]; then
   graphname="sp2b"
 fi
 
+
 # Check if -t is set, otherwise set default to 100
 if [[ -z "$triples" ]]; then
   echo "No -t triples input provided. Using default triples 100."
@@ -143,8 +173,38 @@ check_core_resources "$cores"
 check_memory_resources "$mem"
 
 ##########################################################
+# PERFORM BENCHMARK
 real_path=$(realpath "$0")
 basedir=$(dirname "$real_path")
 spx_sh=$basedir/spx.sh
-"$spx_sh" "$graphname" "$triples" "$mem" "$cores" "$iterations" || exit 1
+"$spx_sh" "$graphname" "$model" "$transpiler" "$triples" "$mem" "$cores" "$iterations" || exit 1
 
+
+##########################################################
+# TEST OF ARGUMENTS
+# echo "graphname: $graphname"
+# echo "model: $model"
+# echo "transpiler: $transpiler"
+# echo "triples: $triples"
+# echo "mem: $mem"
+# echo "cores: $cores"
+# echo "iterations: $iterations"
+
+# Valid test commands
+# ./rapsqlbench.sh -g sp2b -l yars -r plain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r cpo1 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r cpo2 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r mano -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r plain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r cpo1 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r cpo2 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l rdfid -r mano -t 100 -m 1000 -c 1 -i 1
+
+
+# Invalid test commands
+# ./rapsqlbench.sh -g sp2b -l yars -r rplain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yarss -r plain -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l yars -r rplains -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g sp2b -l srdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1

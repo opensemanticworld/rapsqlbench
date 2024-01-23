@@ -1,0 +1,63 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_default_route_table.tf-aws-rt (expand)" [label = "aws_default_route_table.tf-aws-rt", shape = "box"]
+		"[root] aws_eip.tf-aws-eip (expand)" [label = "aws_eip.tf-aws-eip", shape = "box"]
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" [label = "aws_instance.tf-aws-ubuntu-instance", shape = "box"]
+		"[root] aws_internet_gateway.tf-aws-gw (expand)" [label = "aws_internet_gateway.tf-aws-gw", shape = "box"]
+		"[root] aws_key_pair.tf-aws-key-pair (expand)" [label = "aws_key_pair.tf-aws-key-pair", shape = "box"]
+		"[root] aws_route.tf-aws-rt (expand)" [label = "aws_route.tf-aws-rt", shape = "box"]
+		"[root] aws_route_table_association.tf-aws-rt-assoc-1 (expand)" [label = "aws_route_table_association.tf-aws-rt-assoc-1", shape = "box"]
+		"[root] aws_security_group.tf-aws-sg (expand)" [label = "aws_security_group.tf-aws-sg", shape = "box"]
+		"[root] aws_subnet.tf-aws-subnet (expand)" [label = "aws_subnet.tf-aws-subnet", shape = "box"]
+		"[root] aws_vpc.tf-aws-vpc (expand)" [label = "aws_vpc.tf-aws-vpc", shape = "box"]
+		"[root] local_file.tf-aws-eip-loc (expand)" [label = "local_file.tf-aws-eip-loc", shape = "box"]
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" [label = "provider[\"registry.terraform.io/hashicorp/aws\"]", shape = "diamond"]
+		"[root] provider[\"registry.terraform.io/hashicorp/local\"]" [label = "provider[\"registry.terraform.io/hashicorp/local\"]", shape = "diamond"]
+		"[root] var.aws_availability_zone" [label = "var.aws_availability_zone", shape = "note"]
+		"[root] var.aws_profile" [label = "var.aws_profile", shape = "note"]
+		"[root] var.aws_region" [label = "var.aws_region", shape = "note"]
+		"[root] var.ebs_iops" [label = "var.ebs_iops", shape = "note"]
+		"[root] var.ebs_throughput" [label = "var.ebs_throughput", shape = "note"]
+		"[root] var.ebs_type" [label = "var.ebs_type", shape = "note"]
+		"[root] var.env_tag" [label = "var.env_tag", shape = "note"]
+		"[root] var.ssh_key_name" [label = "var.ssh_key_name", shape = "note"]
+		"[root] var.vm_map" [label = "var.vm_map", shape = "note"]
+		"[root] aws_default_route_table.tf-aws-rt (expand)" -> "[root] aws_vpc.tf-aws-vpc (expand)"
+		"[root] aws_eip.tf-aws-eip (expand)" -> "[root] aws_instance.tf-aws-ubuntu-instance (expand)"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] aws_internet_gateway.tf-aws-gw (expand)"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] aws_security_group.tf-aws-sg (expand)"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] aws_subnet.tf-aws-subnet (expand)"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] var.ebs_iops"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] var.ebs_throughput"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] var.ebs_type"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] var.ssh_key_name"
+		"[root] aws_instance.tf-aws-ubuntu-instance (expand)" -> "[root] var.vm_map"
+		"[root] aws_internet_gateway.tf-aws-gw (expand)" -> "[root] aws_vpc.tf-aws-vpc (expand)"
+		"[root] aws_key_pair.tf-aws-key-pair (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_key_pair.tf-aws-key-pair (expand)" -> "[root] var.env_tag"
+		"[root] aws_key_pair.tf-aws-key-pair (expand)" -> "[root] var.ssh_key_name"
+		"[root] aws_route.tf-aws-rt (expand)" -> "[root] aws_default_route_table.tf-aws-rt (expand)"
+		"[root] aws_route.tf-aws-rt (expand)" -> "[root] aws_internet_gateway.tf-aws-gw (expand)"
+		"[root] aws_route_table_association.tf-aws-rt-assoc-1 (expand)" -> "[root] aws_default_route_table.tf-aws-rt (expand)"
+		"[root] aws_route_table_association.tf-aws-rt-assoc-1 (expand)" -> "[root] aws_subnet.tf-aws-subnet (expand)"
+		"[root] aws_security_group.tf-aws-sg (expand)" -> "[root] aws_vpc.tf-aws-vpc (expand)"
+		"[root] aws_subnet.tf-aws-subnet (expand)" -> "[root] aws_vpc.tf-aws-vpc (expand)"
+		"[root] aws_subnet.tf-aws-subnet (expand)" -> "[root] var.aws_availability_zone"
+		"[root] aws_vpc.tf-aws-vpc (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_vpc.tf-aws-vpc (expand)" -> "[root] var.env_tag"
+		"[root] local_file.tf-aws-eip-loc (expand)" -> "[root] aws_eip.tf-aws-eip (expand)"
+		"[root] local_file.tf-aws-eip-loc (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/local\"]"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_eip.tf-aws-eip (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_key_pair.tf-aws-key-pair (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_route.tf-aws-rt (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_route_table_association.tf-aws-rt-assoc-1 (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.aws_profile"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.aws_region"
+		"[root] provider[\"registry.terraform.io/hashicorp/local\"] (close)" -> "[root] local_file.tf-aws-eip-loc (expand)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/local\"] (close)"
+	}
+}
+

@@ -2,25 +2,46 @@
 
 graph_name=$1
 query_dir=$2
+model=$3
+transpiler=$4
 
-# rapsqltranspiler version
-# version="v0.1.2-L2L-L2R"
-# version="v0.1.3-L2L"
-version="v0.2.0-rdfid"
+### Rapsqltranspiler version ###
+# Provide manual written q6 and q7 (unsupported by rapsqltranspiler)
+manual_version="v1"
+# Provide transpiler version 
+# Version grammer: vMAJOR.MINOR.PATCH
+# Major is hardcoded yet
+major=0
+# Model sets minor version
+if [[ $model == "yars" ]]; then
+  minor=3
+elif [[ $model == "rdfid" ]]; then
+  minor=4
+fi
+# Transpiler sets patch version
+if [[ $transpiler == "plain" ]]; then
+  patch=0
+elif [[ $transpiler == "cpo1" ]]; then
+  patch=1
+elif [[ $transpiler == "cpo2" ]]; then
+  patch=2
+elif [[ $transpiler == "cpo3" ]]; then
+  patch=3
+fi
+# Set version
+version="v$major.$minor.$patch"
 
-# Paths
+### Paths ###
 sparql_dir="$query_dir/sparql"
 cypher_dir="$query_dir/cypher/$graph_name"
-# cypher_dir="$query_dir/cypher/$version/$graph_name"
 dir_path=$(dirname "$(realpath "$0")")
-q6provider_sh="$dir_path/$version/q6provider.sh"
-q7provider_sh="$dir_path/$version/q7provider.sh"
-rapsqltranspiler_jar="$dir_path/$version/rapsqltranspiler-$version.jar"
+transpiler_dir="$dir_path/$version-$model-$transpiler"
+q6provider_sh="$dir_path/manual-queries/$manual_version/q6provider.sh"
+q7provider_sh="$dir_path/manual-queries/$manual_version/q7provider.sh"
+rapsqltranspiler_jar="$transpiler_dir/rapsqltranspiler-$version-jar-with-dependencies.jar"
 
-# Target directory
-mkdir -p "$cypher_dir"
 
-# Create base file for cypher query as sql file
+### Create base file for cypher query as sql file ###
 sql_create_basefile() {
   local sql_file="$1"
   keyword="$(basename "$sql_file" .sql)"
@@ -34,7 +55,7 @@ SET search_path TO ag_catalog;
 " > "$sql_file"
 }
 
-# Provider manual cypher transformation (q6.sparql and q7.sparql)
+### Provider manual cypher transformation (q6.sparql and q7.sparql) ###
 manual_s2c() {
   local provider_sh="$1"
   local graph_name="$2"
@@ -43,7 +64,7 @@ manual_s2c() {
   "$provider_sh" "$graph_name" > "$file_path" || exit 1
 }
 
-# Provider sparql to cypher transpiled query (all other sparql queries)
+### Provider sparql to cypher transpiled query (all other sparql queries) ###
 transpiler_s2c() {
   local sparql_file="$1"
   local graph_name="$2"
@@ -52,7 +73,7 @@ transpiler_s2c() {
   java -jar "$rapsqltranspiler_jar" "$graph_name" "$sparql_file" >> "$file_path" || exit 1
 }
 
-# Transform all sparql queries to cypher queries
+### Transform all sparql queries to cypher queries ###
 for sparql_file in "$sparql_dir"/*.sparql; do
 
   # transform sparql_file name into .sql instead of .sparql

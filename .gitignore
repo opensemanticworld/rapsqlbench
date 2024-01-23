@@ -1,8 +1,4 @@
 _old/
-# results/*
-results/import
-results/paper
-results/aws/*
 benchmark/sp2b/src/*
 benchmark/data/
 benchmark/measurement/
@@ -16,10 +12,13 @@ terraform.tfstate.backup
 terraform/inventory/
 dev/
 benchmark/rdf2pg/_old_versions
+ansible/ansible.cfg
 ansible/*.yml
 ansible/POSTGRES.md
 ansible/PERFORMANCE.md
 !ansible/deploy.yml
+!ansible/config.yml
+!ansible/pgconf.yml
 rapsql-docker/*
 !rapsql-docker/docker-compose.yml
 !rapsql-docker/.env

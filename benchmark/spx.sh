@@ -4,10 +4,12 @@
 # Usage:    /bin/bash <PATH_TO_rapsqlbench.sh" <POSITIVE_INTEGER>
 
 graphname=$1
-triples=$2
-memory=$3
-cores=$4
-iterations=$5
+model=$2
+transpiler=$3
+triples=$4
+memory=$5
+cores=$6
+iterations=$7
 
 # Function to get the current timestamp
 get_ts() {
@@ -37,14 +39,14 @@ measurement_dir=$cwd/measurement/"$graphname"
 measurement_file="$measurement_dir"/measurement.csv
 query_dir=$cwd/queries
 cypher_dir=$query_dir/cypher/"$graphname"
-# Create data and measurement dirs by triples
+# Create data, measurement, and cypher dirs by graphname
 mkdir -p "$cwd"/{data,measurement}/"$graphname"
+mkdir -p "$cypher_dir"
 
 # # Create measurement json from schema
 # schema_json="$basedir"/schema.json
 # measurement_json="$measurement_dir"/measurement.json
 # jsonpointer=$(jq -r '.["measurement.json"]' "$schema_json")
-
 # echo "$jsonpointer"
 
 # Create measurement csv
@@ -95,31 +97,55 @@ rdf2rapsql_start=$(get_ts)
 echo_tee "RDF2RAPSQL, START, $rdf2rapsql_start"
 # Run rdf2rapsql
 rdf2rapsql_sh=$(realpath "$cwd/rdf2rapsql/rdf2rapsql.sh")
-"$rdf2rapsql_sh" "$graphname" "$memory" "$cores" | tee -a "$measurement_file" || exit 1
+"$rdf2rapsql_sh" "$graphname" "$model" "$memory" "$cores" | tee -a "$measurement_file" || exit 1
 rdf2rapsql_end=$(get_ts)
 echo_tee "RDF2RAPSQL, END, $rdf2rapsql_end"
 echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
 ### RDF2RAPSQL END ###
 
 
-### WRITECYPHER ###
+### PROVIDE CYPHER ###
 # Input: graphname, query_dir
 writecypher_start=$(get_ts)
 echo_tee "WRITECYPHER, START, $writecypher_start"
-# Run writecypher
-writecypher_sh=$(realpath "$cwd/rapsqltranspiler/writecypher.sh")
-"$writecypher_sh" "$graphname" "$query_dir" | tee -a "$measurement_file" || exit 1
+# if transpiler is not equal to "mano" then writecypher else use only manual queries
+if [ "$transpiler" != "mano" ]; then
+  # Run writecypher using rapsqltranspiler
+  writecypher_sh=$(realpath "$cwd/rapsqltranspiler/writecypher.sh")
+  "$writecypher_sh" "$graphname" "$query_dir" "$model" "$transpiler" | tee -a "$measurement_file" || exit 1
+else
+  mano_queries="$cwd/rapsqltranspiler/$transpiler-$model"
+  # Copy manual queries to cypher dir
+  cp "$mano_queries"/*.sql "$cypher_dir"
+fi
 writecypher_end=$(get_ts)
 echo_tee "WRITECYPHER, END, $writecypher_end"
 echo_tee "$("$exectime_sh" "WRITECYPHER" "$writecypher_start" "$writecypher_end")"
 
 
-### RUNQUERIES ###
-# ./rapsqlbench.sh -g spcustompart -t 100 -m 25000 -c 8
+### WARMUP AND IMPORT VERIFICATION ###
+# Input: rapsqltriples.sql
 # Target: rapsql database
+# Output: rapsqltriples.txt
+rapsqltriples_sql="$data_dir"/import/rapsqltriples.sql
+rapsqltriples_txt="$measurement_dir"/rapsqltriples.txt
+# Wait for 5 s after rdf2rapsql
+sleep 5
+# Count of all processed triples from rdf2pg 
+rapsqltriples_cnt_start=$(get_ts)
+echo_tee "RAPSQLTRIPLES-CNT, START, $rapsqltriples_cnt_start"
+sudo -u postgres psql -q -U postgres -d postgres -f "$rapsqltriples_sql" > "$rapsqltriples_txt" || exit 1
+rapsqltriples_cnt_end=$(get_ts)
+echo_tee "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt_end"
+echo_tee "$("$exectime_sh" "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt_start" "$rapsqltriples_cnt_end")"
+
+
+### RUNQUERIES ###
+# Target: rapsql database
+# Wait for 5 s after warmup
+sleep 5
 runqueries_start=$(get_ts)
 echo_tee "RUNQUERIES, START, $runqueries_start"
-
 # Perform queries
 runqueries_sh=$(realpath "$basedir/runqueries.sh")
 "$runqueries_sh" "$cypher_dir" "$measurement_dir" "$exectime_sh" "$iterations" true | tee -a "$measurement_file" || exit 1
