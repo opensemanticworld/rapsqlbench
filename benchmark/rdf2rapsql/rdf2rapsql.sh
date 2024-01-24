@@ -99,8 +99,8 @@ ensure_path "$nbn_sql"
 # Output: {edtp, eop}/*.csv, {edtp, eop}/import/*.sql
 edgepart_start=$(get_ts)
 echo "EDGEPARTITIONING, START, $edgepart_start"
-$edgepart_sh "$graphname" "$edtp_csv" "$edtp_part_txt" || exit 1
-$edgepart_sh "$graphname" "$eop_csv" "$eop_part_txt" || exit 1
+"$edgepart_sh" "$graphname" "$model" "$edtp_csv" "$edtp_part_txt" || exit 1
+"$edgepart_sh" "$graphname" "$model" "$eop_csv" "$eop_part_txt" || exit 1
 edgepart_end=$(get_ts)
 echo "EDGEPARTITIONING, END, $edgepart_end"
 $exectime_sh "EDGEPARTITIONING" "$edgepart_start" "$edgepart_end"

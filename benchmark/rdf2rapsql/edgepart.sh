@@ -1,8 +1,9 @@
 #!/bin/bash
 
 graph_name=$1
-raw_file_path=$2
-raw_part_file_path=$3
+model=$2
+raw_file_path=$3
+raw_part_file_path=$4
 # sql_file=$4
 
 file_name=$(basename "$raw_file_path" .csv)
@@ -60,7 +61,12 @@ SELECT now() AS \"END DBIMPORT $elabel\";" >> "$sql_file"
 output_sql="${sql_dir}/${file_name}.sql"
 sql_create_basefile "$output_sql" "$file_name"
 
-
+# header model edge property name
+if [ "$model" == "rdfid" ]; then
+  property_name="rdfid"
+elif [ "$model" == "yars" ]; then
+  property_name="iri"
+fi
 
 # Create edge partitions in parallel
 while IFS= read -r line; do
@@ -73,7 +79,7 @@ while IFS= read -r line; do
     output_csv="${part_dir}/${keyword}.csv"
 
     # echo "output_csv: $output_csv"
-    echo "start_id,start_vertex_type,end_id,end_vertex_type,rdfid" > "$output_csv"
+    echo "start_id,start_vertex_type,end_id,end_vertex_type,$property_name" > "$output_csv"
     grep ".*$line$" "$raw_file_path" >> "$output_csv"
     # create sql file per edge label
     # sql_create_elabel "$output_sql" "$graph_name" "$keyword"

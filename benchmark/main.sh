@@ -1,7 +1,6 @@
 #!/bin/bash
 # Author:   Andreas Raeder
 # License:  Apache License 2.0
-# Usage:    /bin/bash <PATH_TO_rapsqlbench.sh" <POSITIVE_INTEGER>
 
 graphname=$1
 model=$2

@@ -176,8 +176,8 @@ check_memory_resources "$mem"
 # PERFORM BENCHMARK
 real_path=$(realpath "$0")
 basedir=$(dirname "$real_path")
-spx_sh=$basedir/spx.sh
-"$spx_sh" "$graphname" "$model" "$transpiler" "$triples" "$mem" "$cores" "$iterations" || exit 1
+main_sh=$basedir/main.sh
+"$main_sh" "$graphname" "$model" "$transpiler" "$triples" "$mem" "$cores" "$iterations" || exit 1
 
 
 ##########################################################
