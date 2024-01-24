@@ -85,7 +85,7 @@ sp2b_end=$(get_ts)
 echo_tee "SP2B, TRIPLES, $sp2b_triples"
 echo_tee "SP2B, FILESIZE, $sp2b_filesize"
 echo_tee "SP2B, END, $sp2b_end"
-$exectime_sh "SP2B" "$sp2b_start" "$sp2b_end"
+echo_tee "$("$exectime_sh" "SP2B" "$sp2b_start" "$sp2b_end")"
 ### SP2B END ###
 
 
