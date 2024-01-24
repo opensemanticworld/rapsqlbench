@@ -31,6 +31,19 @@
   become: yes
   become_user: root
   tasks:
+    # Will be later copied to measurement dir of graphname after benchmark
+    - name: Synchronize `config.yml` file of ansible dir to remote `tmp` dir
+      ansible.posix.synchronize:
+        src: ../config.yml
+        dest: /tmp
+
+    # deprecated warning is a bug
+    # https://github.com/ansible-collections/ansible.posix/issues/468
+    - name: Synchronize `benchmark` dir of rapsqlbench to remote `tmp` dir
+      ansible.posix.synchronize:
+        src: ../benchmark
+        dest: /tmp
+
     - name: Install initial packages
       ansible.builtin.apt:
         name:
@@ -275,20 +288,22 @@
   become: yes
   become_user: root
   tasks:
-    # deprecated warning is a bug
-    # https://github.com/ansible-collections/ansible.posix/issues/468
-    - name: Synchronize `benchmark` dir of rapsqlbench to remote `tmp` dir
-      ansible.posix.synchronize:
-        src: ../benchmark
-        dest: /tmp
-
     - name: Perform RAPSQLBench 
       ansible.builtin.shell: 
         cmd: ./rapsqlbench.sh -g {{ graph_name }} -l {{ rdf2pg_model }} -r {{ rapsql_transpiler }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
       when: perform_benchmark
     
-    - name: Copy postgresql.conf to `measurement` dir
+    - name: Copy provided `config.yml` to `measurement` dir
+      ansible.builtin.copy:
+        src: /tmp/config.yml
+        dest: /tmp/benchmark/measurement/{{ graph_name }}/config.yml
+        remote_src: true
+        force: yes
+      become: true 
+      become_user: root
+
+    - name: Copy `postgresql.conf` to `measurement` dir
       ansible.builtin.copy:
         src: /etc/postgresql/15/main/postgresql.conf
         dest: /tmp/benchmark/measurement/{{ graph_name }}/postgresql.conf
