@@ -26,3 +26,4 @@ benchmark/queries/test/*
 benchmark/queries/*.jar
 benchmark/queries/cypher/
 results/data/*
+results/

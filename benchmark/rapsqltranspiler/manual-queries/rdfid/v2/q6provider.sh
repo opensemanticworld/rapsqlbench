@@ -2,7 +2,7 @@
 
 graph_name=$1
 
-q6="-- cypher/i9-q6.sql !MANUALLY CREATED
+q6="-- cypher/i9-q6.sql !MANUALLY CREATED (v2: rdfid, OPTIONAL MATCH)
 
 -- age config
 LOAD 'age';
