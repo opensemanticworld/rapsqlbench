@@ -58,7 +58,7 @@
 
     and confirm with `yes` if prompted for ssh fingerprint.
 
-8. (Optional) To monitor the measurement files connect to remote vm via ssh, you can use the following command for a `graphname` of your choice, e.g. `sp50k`:
+8. (Optional) To monitor the measurement files connect to remote vm via ssh, you can use the following command for a `graphname` of your choice. `Perform benchmark` must be running in ansible first in order to provide the measurement file.
 
     ```bash
     tail -f -n +1 /tmp/benchmark/measurement/sp50k/measurement.csv
