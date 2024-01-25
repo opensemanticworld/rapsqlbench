@@ -176,7 +176,7 @@
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
         regex: '^#?checkpoint_completion_target'
-        line: 'checkpoint_completion_target = {{ checkpoint_completion_target | default("0.9") }}'
+        line: 'checkpoint_completion_target = {{ checkpoint_completion_target | default("0.5") }}'
         state: present
       when: checkpoint_completion_target is defined
 
