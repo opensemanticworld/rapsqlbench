@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author:   Andreas Raeder
+# Author:   Andreas Räder (https://github.com/raederan)
 # License:  Apache License 2.0
 
 graphname=$1
@@ -42,11 +42,6 @@ cypher_dir=$query_dir/cypher/"$graphname"
 mkdir -p "$cwd"/{data,measurement}/"$graphname"
 mkdir -p "$cypher_dir"
 
-# # Create measurement json from schema
-# schema_json="$basedir"/schema.json
-# measurement_json="$measurement_dir"/measurement.json
-# jsonpointer=$(jq -r '.["measurement.json"]' "$schema_json")
-# echo "$jsonpointer"
 
 # Create measurement csv
 measurement_start=$(get_ts)
@@ -59,10 +54,8 @@ echo_tee "MEASUREMENT, INPUT, $triples"
 echo_tee "MEASUREMENT, PID, $$" 
 
 
-
 ### SP2B ###
-# Generate "-t X" rdf triples 
-# Output: spX.n3
+# Generate -t "X" rdf triples 
 sp2b=$cwd/sp2b/bin
 sp2b_txt=$cwd/measurement/"$graphname"/sp2b.txt
 sp2b_start=$(get_ts)
@@ -90,7 +83,6 @@ echo_tee "$("$exectime_sh" "SP2B" "$sp2b_start" "$sp2b_end")"
 
 
 ### RDF2RAPSQL ###
-# Input: spX.n3
 # Target: rapsql database
 echo_tee "RDF2RAPSQL, RAPSQLMODEL, $model"
 rdf2rapsql_start=$(get_ts)
@@ -105,8 +97,7 @@ echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
 
 
 ### PROVIDE CYPHER ###
-# Input: graphname, query_dir
-# echo_tee "WRITECYPHER, RAPSQLTRANSPILER, $transpiler"
+echo_tee "WRITECYPHER, RAPSQLTRANSPILER, $transpiler"
 writecypher_start=$(get_ts)
 echo_tee "WRITECYPHER, START, $writecypher_start"
 # if transpiler is not equal to "mano" then writecypher else use only manual queries
