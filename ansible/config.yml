@@ -23,7 +23,7 @@ perform_benchmark: true
 triples: 125000000
 memory: 250000
 cores: 32
-iterations: 1
+iterations: 10
 
 ### Benchmark fetch results config ############################
 # data can be huge for very large triple values
