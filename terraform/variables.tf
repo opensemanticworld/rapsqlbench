@@ -68,26 +68,11 @@ variable "vm_map" {
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 100
     # }
-    "vm250k21" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 250
-    }
-    "vm250k31" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 250
-    }
-    "vm250k61" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 250
-    }
-    "vm250k71" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 250
-    }
+    # "vm250k22" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 250
+    # }
     # "vm1m" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
@@ -98,26 +83,26 @@ variable "vm_map" {
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 150
     # }
-    # "vm125m" = {
-    #   ami           = "ami-04e601abe3e1a910f"
-    #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 500
-    # }
-    # "vm250m" = {
-    #   ami           = "ami-04e601abe3e1a910f"
-    #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 500
-    # }
-    # "vm500m" = {
-    #   ami           = "ami-04e601abe3e1a910f"
-    #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 1000
-    # }
-    # "vm1bn" = {
-    #   ami           = "ami-04e601abe3e1a910f"
-    #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 1000
-    # }
+    "vm125mr2" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 600
+    }
+    "vm250mr2" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 1200
+    }
+    "vm500mr2" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 2400
+    }
+    "vm1bnr2" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 4800
+    }
   }
 }
 

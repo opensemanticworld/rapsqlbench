@@ -8,19 +8,19 @@ postgres_apt_version: 15
 apache_age_git_version: release/PG15/1.5.0
 
 ### Database interoperability config ##########################
-graph_name: sp250k21y11
+graph_name: sp125mr2
 
 # Model options [gdm]: 
 # yars | rdfid
-rdf2pg_model: yars
+rdf2pg_model: rdfid
 
 # Transpiler options [gdm, yars, rdfid]: 
 # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) 
-rapsql_transpiler: cpo1
+rapsql_transpiler: cpo2
 
 ### Benchmark metrics config ##################################
 perform_benchmark: true
-triples: 250000
+triples: 125000000
 memory: 250000
 cores: 32
 iterations: 1
@@ -29,12 +29,12 @@ iterations: 1
 # data can be huge for very large triple values
 fetch_measurement: true
 fetch_queries: true
-fetch_data: true
+fetch_data: false
 
 ### PostgreSQL config #########################################
 statement_timeout: 30min
-shared_buffers: 10GB
-effective_cache_size: 125GB
+# shared_buffers: 10GB
+# effective_cache_size: 125GB
 # max_connections: 32
 # work_mem: 32MB
 # maintenance_work_mem: 1GB
