@@ -7,7 +7,7 @@ transpiler=$4
 
 ### Rapsqltranspiler version ###
 # Provide manual written q6 and q7 (unsupported by rapsqltranspiler)
-manual_version="v2"
+manual_version="v1"
 # Provide transpiler version 
 # Version grammer: vMAJOR.MINOR.PATCH
 # Major is hardcoded yet

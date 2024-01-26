@@ -63,16 +63,31 @@ variable "vm_map" {
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 30
     # }
-    "vm50k" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 100
-    }
-    # "vm250k" = {
+    # "vm50k" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 100
     # }
+    "vm250k21" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 250
+    }
+    "vm250k31" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 250
+    }
+    "vm250k61" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 250
+    }
+    "vm250k71" = {
+      ami           = "ami-04e601abe3e1a910f"
+      instance_type = "r5.8xlarge"
+      ebs_size      = 250
+    }
     # "vm1m" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
