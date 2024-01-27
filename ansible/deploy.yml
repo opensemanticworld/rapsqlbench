@@ -36,6 +36,7 @@
       ansible.posix.synchronize:
         src: ../config.yml
         dest: /tmp
+      when: perform_benchmark
 
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
@@ -43,6 +44,7 @@
       ansible.posix.synchronize:
         src: ../benchmark
         dest: /tmp
+      when: perform_benchmark
 
     - name: Install initial packages
       ansible.builtin.apt:
@@ -272,12 +274,14 @@
       ansible.builtin.service:
         name: postgresql
         state: restarted
+      when: perform_benchmark
 
     - name: Wait for Postgres to restart
       ansible.builtin.wait_for:
         port: 5432
         delay: 5
         timeout: 300
+      when: perform_benchmark
 # End: POSTGRES CONFIGURATION
 
 
@@ -302,6 +306,7 @@
         force: yes
       become: true 
       become_user: root
+      when: perform_benchmark
 
     - name: Copy `postgresql.conf` to `measurement` dir
       ansible.builtin.copy:
@@ -311,6 +316,7 @@
         force: yes
       become: true 
       become_user: root
+      when: perform_benchmark
 # End: RAPSQLBench
 
 # Start: Fetch Results
