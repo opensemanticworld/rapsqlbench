@@ -11,13 +11,15 @@ performance_csv=$measurement_dir/performance.csv
 
 # use input_dir as parameter that has subfolders with .txt files to extract all execution times
 function execution_times {
-    local input_dir=$1
-    local csv_file=$2
-    for dir in "$input_dir"/*; do
+  local input_dir=$1
+  local csv_file=$2
+  for dir in $(find "$input_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -V); do    
+    if [[ -d "$input_dir/$dir" ]]; then
       # extract the exec times of each txt file in the subfolders and append them to a file
       # the values are cut of nanoseconds and are divided by 1000 to get the time in seconds
-      tail -n1 "$dir"/*.txt | sed -n 's/.*Time: \([0-9]*\).*/\1/p' | awk '{print $1/1000}' | paste -s -d, >> "$csv_file"
-    done
+      tail -n1 "$input_dir/$dir"/*.txt | sed -n 's/.*Time: \([0-9]*\).*/\1/p' | awk '{print $1/1000}' | paste -s -d, >> "$csv_file"
+    fi
+  done
 }
 
 # arithmetic mean
