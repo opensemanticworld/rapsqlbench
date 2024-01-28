@@ -8,28 +8,39 @@ postgres_apt_version: 15
 apache_age_git_version: release/PG15/1.5.0
 
 ### Database interoperability config ##########################
-graph_name: sp250mr1
+# Example graph name: sp50kr2i10 
+# [sp]2b [50k] triples, model [r]dfid, transpiler cpo[2],
+# manual query version q6+q7 [v1], [i]terations [10] 
+# !do not use spaces, special characters or leading numbers!
+# !do also not use postgres reserved beginnings (pg, ag, ...)!
+graph_name: sp50kr2v1i2
 
-# Model options [gdm]: 
-# yars | rdfid
+# Valid model options [gdm]:  yars | rdfid
 rdf2pg_model: rdfid
 
-# Transpiler options [gdm, yars, rdfid]: 
+# Valid transpiler options [gdm, yars, rdfid]: 
 # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) 
-rapsql_transpiler: cpo1
+rapsql_transpiler: cpo2
+
+# Version of manual query designs: q6, q7 [yars, rdfid]
+# Valid options: v1 | v2
+manual_qv67: v1
 
 ### Benchmark metrics config ##################################
-perform_benchmark: false
-triples: 250000000
+perform_benchmark: true
+triples: 50000
 memory: 250000
 cores: 32
-iterations: 10
+iterations: 1
 
 ### Benchmark fetch results config ############################
-# !huge data for large triple setups (250m triples: ~73GB)
+# !Depends on the `results` structure of this repository!
+# !Huge data sizes for large triple setups (apx. linear)!
+# !Setting `fetch_data=true` will need some free space locally!
+# Exapmle data sizes: 50k~15MB, 250k~75MB, 125m~37GB, 250m~74GB
 fetch_measurement: true
 fetch_queries: true
-fetch_data: false
+fetch_data: true
 
 ### PostgreSQL config #########################################
 statement_timeout: 30min

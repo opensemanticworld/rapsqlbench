@@ -4,10 +4,10 @@ graph_name=$1
 query_dir=$2
 model=$3
 transpiler=$4
+# !q6 and q7 unsupported by rapsqltranspiler yet (manual versions)
+man_qv67=$5
 
 ### Rapsqltranspiler version ###
-# Provide manual written q6 and q7 (unsupported by rapsqltranspiler)
-manual_version="v1"
 # Provide transpiler version 
 # Version grammer: vMAJOR.MINOR.PATCH
 # Major is hardcoded yet
@@ -36,9 +36,10 @@ sparql_dir="$query_dir/sparql"
 cypher_dir="$query_dir/cypher/$graph_name"
 dir_path=$(dirname "$(realpath "$0")")
 transpiler_dir="$dir_path/$version-$model-$transpiler"
-q6provider_sh="$dir_path/manual-queries/$model/$manual_version/q6provider.sh"
-q7provider_sh="$dir_path/manual-queries/$model/$manual_version/q7provider.sh"
 rapsqltranspiler_jar="$transpiler_dir/rapsqltranspiler-$version-jar-with-dependencies.jar"
+# !manually versions of q6 and q7 for yars and rdfid
+q6provider_sh="$dir_path/manual-queries/$model/$man_qv67/q6provider.sh"
+q7provider_sh="$dir_path/manual-queries/$model/$man_qv67/q7provider.sh"
 
 
 ### Create base file for cypher query as sql file ###

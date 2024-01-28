@@ -58,51 +58,59 @@ variable "vm_map" {
     #   instance_type = "t2.micro"
     #   ebs_size      = 30
     # }
-    # "vm100" = {
-    #   ami           = "ami-04e601abe3e1a910f"
-    #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 30
-    # }
     # "vm50k" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 100
     # }
-    # "vm250k22" = {
+    # "vm50k2" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 100
+    # }
+    # "vm250k" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
     #   ebs_size      = 250
     # }
-    # "vm1m" = {
+    # "vm125m" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 150
+    #   ebs_size      = 600
     # }
-    # "vm5m" = {
+    # "vm250m" = {
     #   ami           = "ami-04e601abe3e1a910f"
     #   instance_type = "r5.8xlarge"
-    #   ebs_size      = 150
+    #   ebs_size      = 600
     # }
-    "vm125mr2" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 600
-    }
-    "vm250mr2" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 1200
-    }
-    "vm500mr2" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 2400
-    }
-    "vm1bnr2" = {
-      ami           = "ami-04e601abe3e1a910f"
-      instance_type = "r5.8xlarge"
-      ebs_size      = 4800
-    }
+    # "vm500m" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 2400
+    # }
+    # "vm1bn" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 4800
+    # }
+    # "vm125my2" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 600
+    # }
+    # "vm250my1" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 1200
+    # }
+    # "vm250my2" = {
+    #   ami           = "ami-04e601abe3e1a910f"
+    #   instance_type = "r5.8xlarge"
+    #   ebs_size      = 1200
+    # }
+
+
+    
   }
 }
 

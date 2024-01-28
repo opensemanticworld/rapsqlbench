@@ -5,10 +5,11 @@
 graphname=$1
 model=$2
 transpiler=$3
-triples=$4
-memory=$5
-cores=$6
-iterations=$7
+man_qv67=$4
+triples=$5
+memory=$6
+cores=$7
+iterations=$8
 
 # Function to get the current timestamp
 get_ts() {
@@ -98,18 +99,12 @@ echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
 
 ### PROVIDE CYPHER ###
 echo_tee "WRITECYPHER, RAPSQLTRANSPILER, $transpiler"
+echo_tee "WRITECYPHER, RAPSQLMANQV67, $man_qv67"
 writecypher_start=$(get_ts)
 echo_tee "WRITECYPHER, START, $writecypher_start"
-# if transpiler is not equal to "mano" then writecypher else use only manual queries
-if [ "$transpiler" != "mano" ]; then
-  # Run writecypher using rapsqltranspiler
-  writecypher_sh=$(realpath "$cwd/rapsqltranspiler/writecypher.sh")
-  "$writecypher_sh" "$graphname" "$query_dir" "$model" "$transpiler" | tee -a "$measurement_file" || exit 1
-else
-  mano_queries="$cwd/rapsqltranspiler/$transpiler-$model"
-  # Copy manual queries to cypher dir
-  cp "$mano_queries"/*.sql "$cypher_dir"
-fi
+# Run writecypher using rapsqltranspiler
+writecypher_sh=$(realpath "$cwd/rapsqltranspiler/writecypher.sh")
+"$writecypher_sh" "$graphname" "$query_dir" "$model" "$transpiler" "$man_qv67" | tee -a "$measurement_file" || exit 1
 writecypher_end=$(get_ts)
 echo_tee "WRITECYPHER, END, $writecypher_end"
 echo_tee "$("$exectime_sh" "WRITECYPHER" "$writecypher_start" "$writecypher_end")"
@@ -154,7 +149,7 @@ calcperformance_start=$(get_ts)
 echo_tee "CALCPERFORMANCE, START, $calcperformance_start"
 # Run calcperformance
 calcperformance_sh=$(realpath "$basedir/calcp.sh")
-"$calcperformance_sh" "$cypher_dir" "$measurement_dir" | tee -a "$measurement_file" || exit 1
+"$calcperformance_sh" "$cypher_dir" "$measurement_dir" "$iterations" | tee -a "$measurement_file" || exit 1
 calcperformance_end=$(get_ts)
 echo_tee "CALCPERFORMANCE, END, $calcperformance_end"
 echo_tee "$("$exectime_sh" "CALCPERFORMANCE" "$calcperformance_start" "$calcperformance_end")"

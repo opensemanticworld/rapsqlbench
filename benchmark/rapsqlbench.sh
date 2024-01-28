@@ -45,8 +45,17 @@ match_model_option() {
 # Function to check if rapsqltranspiler option is valid 
 match_transpiler_option() {
   local transpiler=$1
-  if ! [[ $transpiler =~ ^(plain|cpo1|cpo2|cpo3|mano)$ ]]; then
-    echo "ERROR: Invalid transpiler arg, must be either Xplain, Xcpo1, Xcpo2, Xcpo3, Xmano with X = y or r."
+  if ! [[ $transpiler =~ ^(plain|cpo1|cpo2|cpo3)$ ]]; then
+    echo "ERROR: Invalid transpiler arg, must be either Xplain, Xcpo1, Xcpo2, Xcpo3 with X = y or r."
+    exit 1
+  fi
+}
+
+# Function to check manual query options for q6 and q7 (v1 | v2)
+match_man_query_option() {
+  local query=$1
+  if ! [[ $query =~ ^(v1|v2)$ ]]; then
+    echo "ERROR: Invalid query arg, must be either v1 or v2."
     exit 1
   fi
 }
@@ -82,7 +91,7 @@ check_memory_resources() {
 }
 
 # Parse command line arguments
-while getopts ":g:l:r:t:m:c:i:" opt; do
+while getopts ":g:l:r:t:q:m:c:i:" opt; do
   case $opt in
     g)
       if match_graphname_pattern "$OPTARG"; then
@@ -97,6 +106,11 @@ while getopts ":g:l:r:t:m:c:i:" opt; do
     r)
       if match_transpiler_option "$OPTARG"; then
         transpiler=$OPTARG
+      fi
+      ;;
+    q) 
+     if match_man_query_option "$OPTARG"; then
+        man_qv67=$OPTARG
       fi
       ;;
     t)
@@ -155,7 +169,7 @@ if [[ -z "$cores" ]]; then
   cores=1
 fi
 
-# Warn if input triple is greater than 1 billion and ask to proceed
+# Promt user if input triple is greater than 1 billion and ask to proceed
 if [[ $triples -gt 1000000000 ]]; then
   read -r -p "WARNING: The input triple number is greater than 1 billion, this execution will write a huge amount of data. Do you want to proceed? [y/N] " response
   if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
@@ -177,7 +191,7 @@ check_memory_resources "$mem"
 real_path=$(realpath "$0")
 basedir=$(dirname "$real_path")
 main_sh=$basedir/main.sh
-"$main_sh" "$graphname" "$model" "$transpiler" "$triples" "$mem" "$cores" "$iterations" || exit 1
+"$main_sh" "$graphname" "$model" "$transpiler" "$man_qv67" "$triples" "$mem" "$cores" "$iterations" || exit 1
 
 
 ##########################################################
@@ -195,13 +209,10 @@ main_sh=$basedir/main.sh
 # ./rapsqlbench.sh -g sp2b -l yars -r cpo1 -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l yars -r cpo2 -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l yars -r cpo3 -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l yars -r mano -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l rdfid -r plain -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l rdfid -r cpo1 -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l rdfid -r cpo2 -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l rdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1
-# ./rapsqlbench.sh -g sp2b -l rdfid -r mano -t 100 -m 1000 -c 1 -i 1
-
 
 # Invalid test commands
 # ./rapsqlbench.sh -g sp2b -l yars -r rplain -t 100 -m 1000 -c 1 -i 1

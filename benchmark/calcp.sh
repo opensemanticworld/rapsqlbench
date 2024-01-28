@@ -12,7 +12,7 @@ performance_csv=$measurement_dir/performance.csv
 exectimes_mean_csv=$measurement_dir/exectimes-mean.csv
 performance_mean_csv=$measurement_dir/performance-mean.csv
 
-# use input_dir as parameter that has subfolders with .txt files to extract all execution times
+# Use input_dir as parameter that has subfolders with .txt files to extract all execution times
 function extract_execution_times {
   local input_dir=$1
   local csv_file=$2
@@ -73,9 +73,32 @@ function calc_metrics {
   done < <(tail -n +2 "$input_csv")
 }
 
+# Use input_dir as parameter that has subfolders with .txt files to extract all row counts detected by buzzword row of tail
+function extract_row_cnts {
+  local input_dir=$1
+  local csv_file=$2
+  for dir in $(find "$input_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -V); 
+  do
+    dir_name=$(basename "$dir")
+    echo -n "$dir_name" >> "$csv_file"
+    if [[ -d "$input_dir/$dir" ]]; then
+      for file in "$input_dir/$dir"/*.txt; do
+        row_cnt=$(tail -n4 "$file" | grep "row")
+        if [[ -n "$row_cnt" ]]; then
+          echo -n ","
+          echo -n "$row_cnt" | sed -n 's/.*(\([0-9]*\) .*/\1/p'
+          # echo -n "$output" | sed -n 's/.*(\([0-9]*\).* .*/\1/p'
+        else
+          echo -n ",--"
+        fi
+      done | paste -s >> "$csv_file"
+    fi
+  done
+}
+
 
 ### RESULTS ###
-# exectimes.csv, exectimes-mean.csv headers
+# # exectimes.csv, exectimes-mean.csv headers
 queries_header="q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
 # performance.csv, performance-mean.csv headers
 performance_header="arithmetic_mean,geometric_mean"
@@ -97,3 +120,9 @@ if [[ "$iterations" -gt 1 ]]; then
   echo "$performance_header" > "$performance_mean_csv"
   mean_of_columns "$performance_csv" "$performance_mean_csv"
 fi
+
+# rowcounts.csv
+rowcount_csv=$measurement_dir/rowcounts.csv
+rowcount_header="iteration,q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
+echo "$rowcount_header" > "$rowcount_csv"
+extract_row_cnts "$responses_dir" "$rowcount_csv"
