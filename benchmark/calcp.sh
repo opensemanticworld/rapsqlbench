@@ -3,14 +3,17 @@
 # Input Paths
 cypher_dir=$1
 measurement_dir=$2
+iterations=$3
 
 # Config Paths
 responses_dir=$cypher_dir/responses
 exectimes_csv=$measurement_dir/exectimes.csv
 performance_csv=$measurement_dir/performance.csv
+exectimes_mean_csv=$measurement_dir/exectimes-mean.csv
+performance_mean_csv=$measurement_dir/performance-mean.csv
 
 # use input_dir as parameter that has subfolders with .txt files to extract all execution times
-function execution_times {
+function extract_execution_times {
   local input_dir=$1
   local csv_file=$2
   for dir in $(find "$input_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -V); do    
@@ -27,10 +30,11 @@ function arithmetic_mean {
   local line_input=$1
   local output_csv=$2
   # calculate the arithmetic mean for each row value
-  arithmetic_mean=$(echo "$line_input" | awk -F ',' '{sum=0; for(i=1; i<=NF; i++) sum+=$i; print sum/NF}')
+  # arithmetic_mean=$(echo "$line_input" | awk -F ',' '{sum=0; for(i=1; i<=NF; i++) sum+=$i; print sum/NF}')
+  arithmetic_mean=$(echo "$line_input" | awk -F ',' '{sum=0; for(i=1; i<=NF; i++) sum+=$i; printf "%.3f", sum/NF}')
+
   # append the result to the same line in output csv file
   echo -n "$arithmetic_mean" >> "$output_csv"
-
 }
 
 # geometric mean
@@ -38,9 +42,19 @@ function geometric_mean {
   local line_input=$1
   local output_csv=$2
   # calculate the geometric mean (the nth root of the product over n number) for each row value
-  geometric_mean=$(echo "$line_input" | awk -F ',' '{product=1; for(i=1; i<=NF; i++) product*=$i; print product^(1/NF)}')
+  # geometric_mean=$(echo "$line_input" | awk -F ',' '{product=1; for(i=1; i<=NF; i++) product*=$i; print product^(1/NF)}')
+  geometric_mean=$(echo "$line_input" | awk -F ',' '{product=1; for(i=1; i<=NF; i++) product*=$i; printf "%.3f", product^(1/NF)}')
   # append the result to a new csv file
   echo "$geometric_mean" >> "$output_csv"
+}
+
+# caclulate mean of columns
+function mean_of_columns {
+  local input_csv=$1
+  local output_csv=$2
+  # calculate mean values of each column in a csv file and append them to a new comma-separated csv file
+  # awk -F ',' 'NR>1 {for(i=1; i<=NF; i++) sum[i]+=$i; count++} END {for(i=1; i<=NF; i++) printf "%s,", sum[i]/count; printf "\n"}' "$input_csv" >> "$output_csv"
+  awk -F ',' 'NR>1 {for(i=1; i<=NF; i++) sum[i]+=$i; count++} END {for(i=1; i<=NF; i++) printf "%.3f,", sum[i]/count; printf "\n"}' "$input_csv" >> "$output_csv"
 }
 
 # calculate performance metrics
@@ -61,14 +75,25 @@ function calc_metrics {
 
 
 ### RESULTS ###
+# exectimes.csv, exectimes-mean.csv headers
+queries_header="q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
+# performance.csv, performance-mean.csv headers
+performance_header="arithmetic_mean,geometric_mean"
 
-# exectimes.csv header
-echo "q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c" > "$exectimes_csv"
-# call execution_times for each query
-execution_times "$responses_dir" "$exectimes_csv"
+# call execution times extraction for each query
+echo "$queries_header" > "$exectimes_csv"
+extract_execution_times "$responses_dir" "$exectimes_csv"
 
-# performance.csv header
-echo "arithmetic_mean,geometric_mean" > "$performance_csv"
-# call performance metrics for each query
+# call performance metrics calculation for each query
+echo "$performance_header" > "$performance_csv"
 calc_metrics "$exectimes_csv" "$performance_csv"
 
+# if iterations greater than one, calculate the mean of columns
+if [[ "$iterations" -gt 1 ]]; then
+  # call mean_of_columns for each query in exectimes.csv
+  echo "$queries_header" > "$exectimes_mean_csv"
+  mean_of_columns "$exectimes_csv" "$exectimes_mean_csv"
+  # call mean_of_columns for performance metrics in performance.csv
+  echo "$performance_header" > "$performance_mean_csv"
+  mean_of_columns "$performance_csv" "$performance_mean_csv"
+fi
