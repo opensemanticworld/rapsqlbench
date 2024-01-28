@@ -11,6 +11,7 @@ exectimes_csv=$measurement_dir/exectimes.csv
 performance_csv=$measurement_dir/performance.csv
 exectimes_mean_csv=$measurement_dir/exectimes-mean.csv
 performance_mean_csv=$measurement_dir/performance-mean.csv
+rowcount_csv=$measurement_dir/rowcounts.csv
 
 # Use input_dir as parameter that has subfolders with .txt files to extract all execution times
 function extract_execution_times {
@@ -98,10 +99,12 @@ function extract_row_cnts {
 
 
 ### RESULTS ###
-# # exectimes.csv, exectimes-mean.csv headers
+# exectimes.csv, exectimes-mean.csv headers
 queries_header="q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
 # performance.csv, performance-mean.csv headers
 performance_header="arithmetic_mean,geometric_mean"
+# rowcounts.csv header
+rowcount_header="iteration,q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
 
 # call execution times extraction for each query
 echo "$queries_header" > "$exectimes_csv"
@@ -121,8 +124,6 @@ if [[ "$iterations" -gt 1 ]]; then
   mean_of_columns "$performance_csv" "$performance_mean_csv"
 fi
 
-# rowcounts.csv
-rowcount_csv=$measurement_dir/rowcounts.csv
-rowcount_header="iteration,q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
+# provide all row counts for each query and iteration
 echo "$rowcount_header" > "$rowcount_csv"
 extract_row_cnts "$responses_dir" "$rowcount_csv"
