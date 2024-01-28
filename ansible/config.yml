@@ -31,7 +31,7 @@ perform_benchmark: true
 triples: 50000
 memory: 250000
 cores: 32
-iterations: 1
+iterations: 2
 
 ### Benchmark fetch results config ############################
 # !Depends on the `results` structure of this repository!
