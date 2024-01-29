@@ -58,7 +58,7 @@
     ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
     ```
 
-    and confirm with `yes` if prompted for ssh fingerprint.
+    and confirm with `yes` if prompted for ssh fingerprint. Deprecation warning of sync module is a [known issue](https://github.com/ansible-collections/ansible.posix/issues/468) and can be ignored.
 
 8. (Optional) To monitor the measurement files connect to remote vm via ssh, you can use the following command for a `graphname` defined in `ansible/config.yml`. Task `Perform benchmark` must be running in ansible first in order to provide the measurement file, which gives a live overview of all metrics. Notice that the generated performance results are extracted from the postgres timings and differ from the results of the measurement file due to small script overhead of the benchmark procedure.
 
