@@ -4,6 +4,8 @@
   - [Prerequisites](#prerequisites)
   - [Terraform Infrastructure Graph](#terraform-infrastructure-graph)
   - [Benchmark Usage](#benchmark-usage)
+  - [Repositories](#repositories)
+  - [License](#license)
   - [Authors](#authors)
 
 ## Prerequisites
@@ -15,8 +17,8 @@
 
 ## Terraform Infrastructure Graph
 
-![Terraform Graph](./images/terraform_graph.svg)
-**Terraform AWS Cloud Infrastructure of `rapsqlbench`.**
+![Terraform Graph](./img/terraform-graph.svg)
+**Terraform AWS Cloud Infrastructure of RAPSQLBench.**
 
 ## Benchmark Usage
 
@@ -58,10 +60,10 @@
 
     and confirm with `yes` if prompted for ssh fingerprint.
 
-8. (Optional) To monitor the measurement files connect to remote vm via ssh, you can use the following command for a `graphname` of your choice. `Perform benchmark` must be running in ansible first in order to provide the measurement file.
+8. (Optional) To monitor the measurement files connect to remote vm via ssh, you can use the following command for a `graphname` defined in `ansible/config.yml`. Task `Perform benchmark` must be running in ansible first in order to provide the measurement file, which gives a live overview of all metrics. Notice that the generated performance results are extracted from the postgres timings and differ from the results of the measurement file due to small script overhead of the benchmark procedure.
 
     ```bash
-    tail -f -n +1 /tmp/benchmark/measurement/sp50k/measurement.csv
+    tail -f -n +1 /tmp/benchmark/measurement/sp50kr2v1i2/measurement.csv
     ```
 
 9. Destroy the infrastructure using Terraform via `main.tf`, run
@@ -71,6 +73,15 @@
     ```
 
     and confirm with `yes` if you have all your results backed up.
+
+## Repositories
+
+- [RDF2PG](https://github.com/raederan/rdf2pg)
+- [RAPSQLTranspiler](https://github.com/OpenSemanticWorld/rapsqltranspiler)
+
+## License
+
+Apache License 2.0
 
 ## Authors
 

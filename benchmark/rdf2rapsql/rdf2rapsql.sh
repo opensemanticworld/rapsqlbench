@@ -44,7 +44,6 @@ rapsql_txt="$measurement_dir"/rapsql.txt
 edtp_part_txt="$data_dir"/edtp_part.txt
 eop_part_txt="$data_dir"/eop_part.txt
 
-
 # Change directory to data source directory
 cd "$data_dir" || exit 0
 
@@ -52,16 +51,15 @@ cd "$data_dir" || exit 0
 echo "RDF2RAPSQL, INSTANCE, $spx_n3"
 echo "RDF2RAPSQL, PID, $$"
 
-
 # Run rdf2pg
 # Input: x.n3
 # Output: nres.csv, nlit.csv, nbn.csv, edtp.csv, eop.csv
 rdf2pg_start=$(get_ts)
 echo "RDF2PG, START, $rdf2pg_start"
 java -Xmx"$memory"m -XX:ActiveProcessorCount="$cores" -jar "$rdf2pg_jar" -gdm "$spx_n3" > "$measurement_dir"/rdf2pg.txt || exit 1 
-# java -Xmx24576m -XX:ActiveProcessorCount="$cores" -jar "$rdf2pg_jar" -gdm "$spx_n3" > "$measurement_dir"/rdf2pg.txt || exit 1 # changed to spx_n3
-# java -Xmx24576m -XX:ActiveProcessorCount=8 -jar "$rdf2pg_jar" -gdm "$rdfsp_instance" > "$measurement_dir"/rdf2pg.txt || exit 1
-# java -Xmx30720m -XX:ActiveProcessorCount=8 -jar "$rdf2pg_jar" -gdm "$rdfsp_instance" > /dev/null || exit
+rdf2pg_end=$(get_ts)
+echo "RDF2PG, END, $rdf2pg_end"
+$exectime_sh "RDF2PG" "$rdf2pg_start" "$rdf2pg_end" 
 
 # Ensure rdf2pg created csv paths
 ensure_path "$nres_csv"
@@ -72,10 +70,6 @@ ensure_path "$eop_csv"
 ensure_path "$edtp_part_txt"
 ensure_path "$eop_part_txt"
 
-rdf2pg_end=$(get_ts)
-echo "RDF2PG, END, $rdf2pg_end"
-$exectime_sh "RDF2PG" "$rdf2pg_start" "$rdf2pg_end" 
-
 # Created init sql file
 $writesql_sh "$graphname" "$nres_csv" "$nlit_csv" "$nbn_csv" || exit 1
 import_dir="$data_dir"/"import"
@@ -83,7 +77,6 @@ init_sql="$import_dir"/init.sql
 ensure_path "$init_sql"
 # Init rapsql graph using init.sql
 sudo -u postgres psql -q -U postgres -d postgres -f "$init_sql" > "$rapsql_txt" || exit 1
-
 
 # Created node sql files
 nodes_dir="$import_dir"/nodes
@@ -112,7 +105,6 @@ eop_sql="$edges_dir"/eop.sql
 ensure_path "$edtp_sql"
 ensure_path "$eop_sql"
 
-
 # Import nodes in parallel
 # Input: import/{nres, nlit, nbn}.sql 
 dbimport_nodes_start=$(get_ts)
@@ -130,34 +122,3 @@ $sqlimport_sh "$edges_dir" "$rapsql_txt" || exit 1
 dbimport_edges_end=$(get_ts)
 echo "DBIMPORT-EDGES, END, $dbimport_edges_end"
 $exectime_sh "DBIMPORT-EDGES" "$dbimport_edges_start" "$dbimport_edges_end"
-
-
-
-
-# Input: *.ypg
-# Output: *.csv, import.sql
-# csv2rapsql_start=$(get_ts)
-# echo "CSV2RAPSQL, START, $csv2rapsql_start"
-# # taskset -c 0-$(($(nproc)-1)) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# $csv2rapsql_sh "$graphname" "$nres_csv" "$nlit_csv" "$nbn_csv" "$edtp_csv" "$eop_csv" "$import_sql" "$writesql_sh" "$exectime_sh" "$epart_sh" || exit 1
-
-# taskset -c $(seq -s, 0 $((cores-1))) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# taskset -c 0-$(($(nproc)-1)) "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# numactl --physcpubind=all --membind=all "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# numactl --physcpubind=all "$csv2rapsql_sh" "$graphname" "$rdf2pg_nodes" "$rdf2pg_edges" || exit 1
-# csv2rapsql_end=$(get_ts)
-# echo "CSV2RAPSQL, END, $csv2rapsql_end"
-# $exectime_sh "CSV2RAPSQL" "$csv2rapsql_start" "$csv2rapsql_end"
-
-# # Run db import
-# # Input: import.sql
-# dbimport_start=$(get_ts)
-# echo "DBIMPORT, START, $dbimport_start"
-# # psql -U postgres -d rapsql -f "$data_dir/import.sql" > "$measurement_dir"/rapsql.txt || exit  
-# # psql without notices -q
-# psql -q -U postgres -d rapsql -f "$import_sql" > "$measurement_dir"/rapsql.txt || exit 1
-# # psql -U postgres -d rapsql -f "$data_dir/import.sql" > /dev/null || exit  
-# # docker exec -it rapsqldb-container psql "postgres://postgres:postgres@rapsqldb:5432/rapsql" -f "mnt/rdf2rapsql/data/sp100/import.sql"
-# dbimport_end=$(get_ts)
-# echo "DBIMPORT, END, $dbimport_end"
-# $exectime_sh "DBIMPORT" "$dbimport_start" "$dbimport_end"

@@ -36,6 +36,7 @@
       ansible.posix.synchronize:
         src: ../config.yml
         dest: /tmp
+      when: perform_benchmark
 
     # deprecated warning is a bug
     # https://github.com/ansible-collections/ansible.posix/issues/468
@@ -43,6 +44,7 @@
       ansible.posix.synchronize:
         src: ../benchmark
         dest: /tmp
+      when: perform_benchmark
 
     - name: Install initial packages
       ansible.builtin.apt:
@@ -176,7 +178,7 @@
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
         regex: '^#?checkpoint_completion_target'
-        line: 'checkpoint_completion_target = {{ checkpoint_completion_target | default("0.9") }}'
+        line: 'checkpoint_completion_target = {{ checkpoint_completion_target | default("0.5") }}'
         state: present
       when: checkpoint_completion_target is defined
 
@@ -272,12 +274,14 @@
       ansible.builtin.service:
         name: postgresql
         state: restarted
+      when: perform_benchmark
 
     - name: Wait for Postgres to restart
       ansible.builtin.wait_for:
         port: 5432
         delay: 5
         timeout: 300
+      when: perform_benchmark
 # End: POSTGRES CONFIGURATION
 
 
@@ -290,7 +294,7 @@
   tasks:
     - name: Perform RAPSQLBench 
       ansible.builtin.shell: 
-        cmd: ./rapsqlbench.sh -g {{ graph_name }} -l {{ rdf2pg_model }} -r {{ rapsql_transpiler }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
+        cmd: ./rapsqlbench.sh -g {{ graph_name }} -l {{ rdf2pg_model }} -r {{ rapsql_transpiler }} -q {{ manual_qv67 }} -t {{ triples }} -m {{ memory }} -c {{ cores }} -i {{ iterations }}
         chdir: /tmp/benchmark    
       when: perform_benchmark
     
@@ -302,6 +306,7 @@
         force: yes
       become: true 
       become_user: root
+      when: perform_benchmark
 
     - name: Copy `postgresql.conf` to `measurement` dir
       ansible.builtin.copy:
@@ -311,6 +316,7 @@
         force: yes
       become: true 
       become_user: root
+      when: perform_benchmark
 # End: RAPSQLBench
 
 # Start: Fetch Results
@@ -320,13 +326,35 @@
   become: yes
   become_user: root
   tasks:
+    - name: Check if measurement dir exists on remote
+      stat:
+        path: /tmp/benchmark/measurement/
+      register: measurement_dir_remote
+
+    - name: Check if measurement dir exists on local
+      stat:
+        path: ../results/measurement
+      register: measurement_dir_local
+      delegate_to: localhost
+
     - name: Synchronize measurement from remote
       ansible.posix.synchronize:
         src: /tmp/benchmark/measurement/
         dest: ../results/measurement
         mode: pull
         delete: no
-      when: fetch_measurement 
+      when: fetch_measurement and measurement_dir_remote.stat.exists and measurement_dir_local.stat.exists
+
+    - name: Check if queries/cypher dir exists on remote
+      stat:
+        path: /tmp/benchmark/queries/cypher/
+      register: cypher_dir_remote
+
+    - name: Check if queries dir exists on local
+      stat:
+        path: ../results/queries
+      register: queries_dir_remote
+      delegate_to: localhost
 
     - name: Synchronize queries from remote
       ansible.posix.synchronize:
@@ -334,7 +362,18 @@
         dest: ../results/queries
         mode: pull
         delete: no
-      when: fetch_queries
+      when: fetch_queries and cypher_dir_remote.stat.exists and queries_dir_remote.stat.exists
+
+    - name: Check if data dir exists on remote
+      stat:
+        path: /tmp/benchmark/data/
+      register: data_dir_remote
+
+    - name: Check if data dir exists on local
+      stat:
+        path: ../results/data
+      register: data_dir_local
+      delegate_to: localhost
     
     - name: Synchronize data from remote
       ansible.posix.synchronize:
@@ -342,5 +381,5 @@
         dest: ../results/data
         mode: pull
         delete: no
-      when: fetch_data
+      when: fetch_data and data_dir_remote.stat.exists and data_dir_local.stat.exists
 # End: Fetch Results
