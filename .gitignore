@@ -1,6 +1,9 @@
+# general
 _old/
 _ign/
 aws.txt
+
+# infrastructure related
 .vscode/
 .terraform/
 .terraform.lock.hcl
@@ -8,4 +11,13 @@ aws.txt
 terraform.tfstate
 terraform.tfstate.backup
 terraform/inventory/
-results/
+
+# local benchmark results structure
+results/data/
+results/measurement/
+results/queries/
+
+# master thesis related
+results/_masterthesis/*/data/
+results/_masterthesis/*/measurement/
+results/_masterthesis/*/queries/
