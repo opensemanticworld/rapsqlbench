@@ -1,0 +1,7 @@
+rdf2pg
+Java app to transform an RDF database into a Property Graph database (i.e. schema and instance data).
+Running generic database mapping
+Number of RDF triples processed: 250128
+Output: instance and schema
+Execution time: 2048 ms 
+

@@ -1,0 +1,1 @@
+/tmp/benchmark/queries/cypher/sp250k72r21/responses/loop-1/f6-q4.txt
