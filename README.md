@@ -1,12 +1,17 @@
 # RAPSQLBench
 
 - [RAPSQLBench](#rapsqlbench)
+  - [Repositories](#repositories)
   - [Prerequisites](#prerequisites)
   - [Terraform Infrastructure Graph](#terraform-infrastructure-graph)
   - [Benchmark Usage](#benchmark-usage)
-  - [Repositories](#repositories)
   - [License](#license)
   - [Authors](#authors)
+
+## Repositories
+
+- [RDF2PG](https://github.com/raederan/rdf2pg)
+- [RAPSQLTranspiler](https://github.com/OpenSemanticWorld/rapsqltranspiler)
 
 ## Prerequisites
 
@@ -73,11 +78,6 @@
     ```
 
     and confirm with `yes` if you have all your results backed up.
-
-## Repositories
-
-- [RDF2PG](https://github.com/raederan/rdf2pg)
-- [RAPSQLTranspiler](https://github.com/OpenSemanticWorld/rapsqltranspiler)
 
 ## License
 
