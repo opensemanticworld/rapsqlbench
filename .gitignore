@@ -19,5 +19,7 @@ results/queries/
 
 # master thesis related
 results/_masterthesis/*/data/
-results/_masterthesis/*/measurement/
 results/_masterthesis/*/queries/
+results/_masterthesis/*/data-log/
+results/_masterthesis/a2-postgresconfig-querydesign/
+results/_masterthesis/a3-large-scale-scenario
