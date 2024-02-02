@@ -45,9 +45,9 @@
     cd rapsqlbench/terraform; terraform init
     ```
 
-4. Setup your own Terraform configuraton in `variables.tf` (rsa pubkey for ssh).
+4. Setup your own Terraform configuraton in [variables.tf](terraform/variables.tf) (!rsa pubkey for ssh).
 
-5. Build the desired infrastructure using Terraform via `main.tf`, run
+5. Build the desired infrastructure using Terraform via [main.tf](terraform/main.tf), run
 
     ```bash
     terraform apply
@@ -55,17 +55,17 @@
 
     and confirm with `yes` if plan is correct and fullfills your requirements.
 
-6. Configure your `RAPSQLBench` setup in `config.yml`.
+6. Important! Configure your `RAPSQLBench` setup in [config.yml](ansible/config.yml) before starting the benchmark.
 
-7. Perform `RAPSQLBench` using Ansible via `deploy.yml` (ssh authorisation required), e.g. with vm name `vm50k` for 50k triple dataset from `terraform` directory`:
+7. Perform `RAPSQLBench` using Ansible via [deploy.yml](ansible/deploy.yml). The extra vars argument is required!
 
     ```bash
     ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
     ```
 
-    and confirm with `yes` if prompted for ssh fingerprint. Deprecation warning of sync module is a [known issue](https://github.com/ansible-collections/ansible.posix/issues/468) and can be ignored.
+    and confirm with `yes` if prompted for ssh fingerprint. Deprecation warning of sync module is a [known issue](https://github.com/ansible-collections/ansible.posix/issues/468) and can be ignored. Please also note that the calculated performance results at the end of `RAPSQLBench` are extracted from the postgres timings and may differ slightly from the results of the measurement file due to the low script overhead of the benchmark procedure.
 
-8. (Optional) To monitor the measurement files connect to remote vm via ssh, you can use the following command for a `graphname` defined in `ansible/config.yml`. Task `Perform benchmark` must be running in ansible first in order to provide the measurement file, which gives a live overview of all metrics. Notice that the generated performance results are extracted from the postgres timings and differ from the results of the measurement file due to small script overhead of the benchmark procedure.
+8. (Optional) To monitor the measurement files, connect to your remote vm via ssh and use `tail` as soon as `Ansible` reaches task `Perform benchmark`. The hole measurement will be tracked in `measurement.csv` and gives a live overview of all metrics.
 
     ```bash
     tail -f -n +1 /tmp/benchmark/measurement/sp50kr2v1i2/measurement.csv
