@@ -1,4 +1,0 @@
-{
-  "graph_name": "rdf",
-  "sparql_query": "SELECT ?v WHERE { ?v ?p 'cat'@en }"
-}
