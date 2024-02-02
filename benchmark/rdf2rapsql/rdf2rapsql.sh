@@ -51,9 +51,9 @@ cd "$data_dir" || exit 0
 echo "RDF2RAPSQL, INSTANCE, $spx_n3"
 echo "RDF2RAPSQL, PID, $$"
 
-# Run rdf2pg
-# Input: x.n3
-# Output: nres.csv, nlit.csv, nbn.csv, edtp.csv, eop.csv
+# Run RDF2PG
+# Input: x.n3, x.ttl, x.nt
+# Output: nres.csv, nlit.csv, nbn.csv, edtp.csv, eop.csv, edtp_part.txt, eop_part.txt
 rdf2pg_start=$(get_ts)
 echo "RDF2PG, START, $rdf2pg_start"
 java -Xmx"$memory"m -XX:ActiveProcessorCount="$cores" -jar "$rdf2pg_jar" -gdm "$spx_n3" > "$measurement_dir"/rdf2pg.txt || exit 1 
