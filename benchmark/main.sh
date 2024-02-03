@@ -175,3 +175,4 @@ measurement_end=$(get_ts)
 echo_tee "MEASUREMENT, END, $measurement_end"
 echo_tee "$("$exectime_sh" "MEASUREMENT" "$measurement_start" "$measurement_end")"
 ### 0 MEASUREMENT END ###
+

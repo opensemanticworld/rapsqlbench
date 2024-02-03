@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
+
 # Input parameters
 graph_name=$1
 rdf2pg_nres=$2
@@ -17,7 +33,8 @@ nbn_sql=$sql_dir/$(basename "$rdf2pg_nbn" .csv).sql
 mkdir -p "$sql_dir"
 
 
-# Create initial sql file: init.sql
+### FUNCTIONS TO CREATE FILE-BASED SQL STATEMENTS START ###
+# Function create AGE sql basefiles
 sql_create_basefile() {
   local msg="$1"
   local sql_file="$2"
@@ -39,6 +56,7 @@ SELECT now() AS \"$msg $keyword\";
 " > "$sql_file"
 }
 
+# Function AGE create graph statement
 sql_create_graph() {
   local sql_file="$1"
   local graph_name="$2"
@@ -46,7 +64,7 @@ sql_create_graph() {
   echo "SELECT create_graph('$graph_name');" >> "$sql_file"
 }
 
-# Create SQL statement functions
+# Function AGE create vlabel statement (nodes)
 sql_create_vlabel() {
   local sql_file="$1"
   local graph_name="$2"
@@ -55,7 +73,8 @@ sql_create_vlabel() {
   echo "SELECT create_vlabel('$graph_name','$vlabel');" >> "$sql_file"
 }
 
-sql_load_edges_from_file() {
+# Function AGE load labels from file statement (nodes)
+sql_load_labels_from_file() {
   local sql_file="$1"
   local graph_name="$2"
   local vlabel="$3"
@@ -72,6 +91,7 @@ SELECT load_labels_from_file(
 SELECT now() AS \"END DBIMPORT $vlabel\";" >> "$sql_file"
 }
 
+# Function count rapsqltriples statement
 sql_cnt_rapsqltriples() {
   local sql_file="$1"
   local graph_name="$2"
@@ -88,7 +108,10 @@ RETURN nl, e, nr \$\$)
 AS (nl agtype, e agtype, nr agtype);
 " >> "$sql_file"
 }
+### FUNCTIONS TO CREATE FILE-BASED SQL STATEMENTS END ###
 
+
+### WRITE SQL FILES START ###
 # Create sql files
 sql_create_basefile "INIT" "$init_sql" "$graph_name"
 sql_create_basefile "IMPORT" "$nres_sql" "Resource"
@@ -101,61 +124,9 @@ sql_create_graph "$init_sql" "$graph_name"
 sql_create_vlabel "$nres_sql" "$graph_name" "Resource"
 sql_create_vlabel "$nlit_sql" "$graph_name" "Literal"
 sql_create_vlabel "$nbn_sql" "$graph_name" "BlankNode"
-sql_load_edges_from_file "$nres_sql" "$graph_name" "Resource" "$rdf2pg_nres"
-sql_load_edges_from_file "$nlit_sql" "$graph_name" "Literal" "$rdf2pg_nlit"
-sql_load_edges_from_file "$nbn_sql" "$graph_name" "BlankNode" "$rdf2pg_nbn"
+sql_load_labels_from_file "$nres_sql" "$graph_name" "Resource" "$rdf2pg_nres"
+sql_load_labels_from_file "$nlit_sql" "$graph_name" "Literal" "$rdf2pg_nlit"
+sql_load_labels_from_file "$nbn_sql" "$graph_name" "BlankNode" "$rdf2pg_nbn"
 sql_cnt_rapsqltriples "$rapsqltriples_sql" "$graph_name"
+### WRITE SQL FILES END ###
 
-
-# # Basic Import and node import statements
-# sql="
-# SELECT now() AS \"IMPORT CONFIG\";
-
-# -- age config
-# LOAD 'age';
-# SET search_path TO ag_catalog;
-
-# -- disable notices https://stackoverflow.com/a/3531274
-# SET client_min_messages TO WARNING;
-
-# -- create graph
-# SELECT create_graph('$graph_name');
-
-
-# -- create vlabels (vertices = nodes)
-# SELECT create_vlabel('$graph_name','Resource');
-# SELECT create_vlabel('$graph_name','Literal');
-# SELECT create_vlabel('$graph_name','BlankNode');
-
-
-# -- import nodes (important -> first nodes)
-# SELECT now() AS \"IMPORT START\";
-# SELECT load_labels_from_file(
-#   '$graph_name',
-#   'Resource',
-#   '$rdf2pg_nres',
-#   true
-# );
-# SELECT now() AS \"IMPORT RESOURCE\";
-
-# SELECT load_labels_from_file(
-#   '$graph_name',
-#   'Literal',
-#   '$rdf2pg_nlit',
-#   true
-# );
-# SELECT now() AS \"IMPORT LITERAL\";
-
-# SELECT load_labels_from_file(
-#   '$graph_name',
-#   'BlankNode',
-#   '$rdf2pg_nbn',
-#   true
-# );
-# SELECT now() AS \"IMPORT BLANKNODE\";
-
-
-# "
-
-# Create SQL import file
-# echo "$sql" >> import.sql

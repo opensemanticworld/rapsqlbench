@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
+
 # Input parameter
 graphname=$1
 model=$2
@@ -51,7 +67,8 @@ cd "$data_dir" || exit 0
 echo "RDF2RAPSQL, INSTANCE, $spx_n3"
 echo "RDF2RAPSQL, PID, $$"
 
-# Run RDF2PG
+
+### i Run RDF2PG START ###
 # Input: x.n3, x.ttl, x.nt
 # Output: nres.csv, nlit.csv, nbn.csv, edtp.csv, eop.csv, edtp_part.txt, eop_part.txt
 rdf2pg_start=$(get_ts)
@@ -69,8 +86,11 @@ ensure_path "$edtp_csv"
 ensure_path "$eop_csv"
 ensure_path "$edtp_part_txt"
 ensure_path "$eop_part_txt"
+### i Run RDF2PG END ###
 
-# Created init sql file
+
+### ii WRITESQL START ###
+# Create init sql file
 $writesql_sh "$graphname" "$nres_csv" "$nlit_csv" "$nbn_csv" || exit 1
 import_dir="$data_dir"/"import"
 init_sql="$import_dir"/init.sql
@@ -86,7 +106,10 @@ nbn_sql="$nodes_dir"/nbn.sql
 ensure_path "$nres_sql"
 ensure_path "$nlit_sql"
 ensure_path "$nbn_sql"
+### ii WRITESQL START ###
 
+
+### iii EDGEPART START ###
 # Create edge partitions and sql files
 # Input: {edtp, eop}.csv
 # Output: {edtp, eop}/*.csv, {edtp, eop}/import/*.sql
@@ -104,9 +127,12 @@ edtp_sql="$edges_dir"/edtp.sql
 eop_sql="$edges_dir"/eop.sql
 ensure_path "$edtp_sql"
 ensure_path "$eop_sql"
+### iii EDGEPART START ###
 
+
+### iv SQLIMPORT START ###
 # Import nodes in parallel
-# Input: import/{nres, nlit, nbn}.sql 
+# Input: import/nodes/{nres,nlit,nbn}.sql 
 dbimport_nodes_start=$(get_ts)
 echo "DBIMPORT-NODES, START, $dbimport_nodes_start"
 $sqlimport_sh "$nodes_dir" "$rapsql_txt" || exit 1
@@ -114,11 +140,16 @@ dbimport_nodes_end=$(get_ts)
 echo "DBIMPORT-NODES, END, $dbimport_nodes_end"
 $exectime_sh "DBIMPORT-NODES" "$dbimport_nodes_start" "$dbimport_nodes_end"
 
+# !        Important note             !
+# ! First import nodes and then edges !
+
 # Import edges in parallel
-# Input: {edtp, eop}/import/*.sql
+# Input: import/edges/{edtp,eop}/.sql
 dbimport_edges_start=$(get_ts)
 echo "DBIMPORT-EDGES, START, $dbimport_edges_start"
 $sqlimport_sh "$edges_dir" "$rapsql_txt" || exit 1
 dbimport_edges_end=$(get_ts)
 echo "DBIMPORT-EDGES, END, $dbimport_edges_end"
 $exectime_sh "DBIMPORT-EDGES" "$dbimport_edges_start" "$dbimport_edges_end"
+### iv SQLIMPORT END ###
+
