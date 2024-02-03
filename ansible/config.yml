@@ -1,6 +1,20 @@
-########################## RAPSQLBench CONFIG ##########################
-# Author(s): 
-  # Andreas Räder (https://github.com/raederan)
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
+
+############################# RAPSQLBench CONFIG #############################
 
 ### Database Installation config ##############################
 # Both versions must be harmonised with each other
@@ -8,15 +22,15 @@ postgres_apt_version: 15
 apache_age_git_version: release/PG15/1.5.0
 
 ### Database interoperability config ##########################
-# Example graph name: sp50kr2i10 
+# Example graph name: sp50ky1i2
 # [sp]2b [50k] triples, model [r]dfid, transpiler cpo[2],
 # manual query version q6+q7 [v1], [i]terations [10] 
-# !do not use spaces, special characters or leading numbers!
-# !do also not use postgres reserved beginnings (pg, ag, ...)!
-graph_name: sp50kr2v1i2
+# !do not use special characters or leading digits!
+# !do also not use postgres reserved beginnings (pg_, ag_, ...)!
+graph_name: sp50ky2v1i2
 
 # Valid model options [gdm]:  yars | rdfid
-rdf2pg_model: rdfid
+rdf2pg_model: yars
 
 # Valid transpiler options [gdm, yars, rdfid]: 
 # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) 
@@ -50,7 +64,7 @@ statement_timeout: 30min
 # work_mem: 32MB
 # maintenance_work_mem: 1GB
 # checkpoint_completion_target: 0.9
-# wal_buffers: 16MB   # -1 = based on shared_buffers
+# wal_buffers: 16MB # -1 = based on shared_buffers
 # default_statistics_target: 100
 # random_page_cost: 1.1
 # effective_io_concurrency: 200

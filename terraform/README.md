@@ -1,19 +1,16 @@
 # Terraform AWS rapsqlbench
 
 <!-- vscode-markdown-toc -->
-<details>
-<summary>Table of Contents</summary>
+Table of Contents
 
 - [Terraform AWS rapsqlbench](#terraform-aws-rapsqlbench)
-  - [1. Prerequisites](#1-prerequisites)
-  - [2. Installation](#2-installation)
-    - [2.1 Terraform CLI](#21-terraform-cli)
-    - [2.2 AWS CLI](#22-aws-cli)
-  - [3. Usage](#3-usage)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Terraform CLI](#terraform-cli)
+    - [AWS CLI](#aws-cli)
+  - [Usage](#usage)
 
-</details>
-
-## 1. Prerequisites
+## Prerequisites
 
 <details>
 <summary>Details</summary>
@@ -31,9 +28,9 @@
 
 </details>
 
-## 2. Installation
+## Installation
 
-### 2.1 Terraform CLI
+### Terraform CLI
 
 <details>
 <summary>Details</summary>
@@ -82,7 +79,7 @@
 
 </details>
 
-### 2.2 AWS CLI
+### AWS CLI
 
 <details>
 <summary>Details</summary>
@@ -110,7 +107,7 @@
 
 </details>
 
-## 3. Usage
+## Usage
 
 1. To configure the AWS CLI, run the following command:
 
@@ -132,8 +129,10 @@
     terraform apply
     ```
 
-5. To install required software for `rapsqlbench` using `ansible`, run:
+5. Configure the `rapsqlbench` setup in [config.yml](../ansible/config.yml) before starting the benchmark.
+
+6. To perform `rapsqlbench` from `terraform` directory using `ansible`, e.g. vm name `vm50k` run:
 
     ```bash
-    ansible-playbook -i terraform/inventory/<vm-X>.txt deploy.yml
+    ansible-playbook -i ./inventory/vm50k-eip.txt ../ansible/deploy.yml -e "@../ansible/config.yml"
     ```

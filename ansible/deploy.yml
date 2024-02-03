@@ -1,5 +1,5 @@
-# Begin: Prerequisites
-- name: PREREQUISITES
+# Begin: Cloud init
+- name: CLOUD INIT
   hosts: all
   gather_facts: false
   user: ubuntu
@@ -12,16 +12,7 @@
     - name: Cloud-init done
       ansible.builtin.raw:  while [ ! -f /var/lib/cloud/instance/boot-finished]; do sleep 10s; done
       changed_when: false
-
-    - name: Check if Python 3 symlink exists
-      ansible.builtin.stat:
-        path: /usr/bin/python
-      register: python_symlink
-
-    - name: Create Python 3 symlink if not exists
-      ansible.builtin.raw: ln -s /usr/bin/python3 /usr/bin/python
-      when: not python_symlink.stat.exists
-# End: Prerequisites
+# End: Cloud init
 
 
 # Begin: Provide Software
@@ -31,6 +22,9 @@
   become: yes
   become_user: root
   tasks:
+    # !deprecated warning is a bug and a known issue
+    # https://github.com/ansible-collections/ansible.posix/issues/468
+
     # Will be later copied to measurement dir of graphname after benchmark
     - name: Synchronize `config.yml` file of ansible dir to remote `tmp` dir
       ansible.posix.synchronize:
@@ -38,8 +32,7 @@
         dest: /tmp
       when: perform_benchmark
 
-    # deprecated warning is a bug
-    # https://github.com/ansible-collections/ansible.posix/issues/468
+
     - name: Synchronize `benchmark` dir of rapsqlbench to remote `tmp` dir
       ansible.posix.synchronize:
         src: ../benchmark

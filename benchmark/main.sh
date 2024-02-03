@@ -1,6 +1,20 @@
 #!/bin/bash
-# Author:   Andreas Räder (https://github.com/raederan)
-# License:  Apache License 2.0
+
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
 
 graphname=$1
 model=$2
@@ -30,9 +44,7 @@ basedir=$(dirname "$real_path")
 exectime_sh=$basedir/exectime.sh
 cd "$basedir" || exit 0
 cwd=$(pwd)
-###########################################
 
-### MEASUREMENT START ###
 # Create project dirs
 data_dir=$cwd/data/"$graphname"
 measurement_dir=$cwd/measurement/"$graphname"
@@ -43,10 +55,12 @@ cypher_dir=$query_dir/cypher/"$graphname"
 mkdir -p "$cwd"/{data,measurement}/"$graphname"
 mkdir -p "$cypher_dir"
 
-
 # Create measurement csv
 measurement_start=$(get_ts)
 echo "Process, Parameter, Value" | tee "$measurement_file"
+###########################################
+
+### 0 MEASUREMENT START ###
 echo_tee "MEASUREMENT, START, $measurement_start" 
 echo_tee "MEASUREMENT, SCRIPT, $real_path"
 echo_tee "MEASUREMENT, BASEDIR, $basedir"
@@ -55,14 +69,13 @@ echo_tee "MEASUREMENT, INPUT, $triples"
 echo_tee "MEASUREMENT, PID, $$" 
 
 
-### SP2B ###
-# Generate -t "X" rdf triples 
+### 1 SP2B GEN START ###
+# Generate -t "X" rdf triples as .n3 file
 sp2b=$cwd/sp2b/bin
 sp2b_txt=$cwd/measurement/"$graphname"/sp2b.txt
 sp2b_start=$(get_ts)
 echo_tee "SP2B, START, $sp2b_start"
 echo_tee "SP2B, DIR, $sp2b"
-
 # Change to sp2b dir
 cd "$sp2b" || exit
 # Run sp2b
@@ -80,10 +93,10 @@ echo_tee "SP2B, TRIPLES, $sp2b_triples"
 echo_tee "SP2B, FILESIZE, $sp2b_filesize"
 echo_tee "SP2B, END, $sp2b_end"
 echo_tee "$("$exectime_sh" "SP2B" "$sp2b_start" "$sp2b_end")"
-### SP2B END ###
+### 1 SP2B GEN END ###
 
 
-### RDF2RAPSQL ###
+### 2 RDF2RAPSQL START ###
 # Target: rapsql database
 echo_tee "RDF2RAPSQL, RAPSQLMODEL, $model"
 rdf2rapsql_start=$(get_ts)
@@ -94,10 +107,10 @@ rdf2rapsql_sh=$(realpath "$cwd/rdf2rapsql/rdf2rapsql.sh")
 rdf2rapsql_end=$(get_ts)
 echo_tee "RDF2RAPSQL, END, $rdf2rapsql_end"
 echo_tee "$("$exectime_sh" "RDF2RAPSQL" "$rdf2rapsql_start" "$rdf2rapsql_end")"
-### RDF2RAPSQL END ###
+### 2 RDF2RAPSQL END ###
 
 
-### PROVIDE CYPHER ###
+### 3 PROVIDE TRANSPILED CYPHER START ###
 echo_tee "WRITECYPHER, RAPSQLTRANSPILER, $transpiler"
 echo_tee "WRITECYPHER, RAPSQLMANQV67, $man_qv67"
 writecypher_start=$(get_ts)
@@ -108,9 +121,10 @@ writecypher_sh=$(realpath "$cwd/rapsqltranspiler/writecypher.sh")
 writecypher_end=$(get_ts)
 echo_tee "WRITECYPHER, END, $writecypher_end"
 echo_tee "$("$exectime_sh" "WRITECYPHER" "$writecypher_start" "$writecypher_end")"
+### 3 PROVIDE TRANSPILED CYPHER END ###
 
 
-### WARMUP AND IMPORT VERIFICATION ###
+### 4 WARMUP AND IMPORT VERIFICATION START ###
 # Input: rapsqltriples.sql
 # Target: rapsql database
 # Output: rapsqltriples.txt
@@ -125,9 +139,10 @@ sudo -u postgres psql -q -U postgres -d postgres -f "$rapsqltriples_sql" > "$rap
 rapsqltriples_cnt_end=$(get_ts)
 echo_tee "RAPSQLTRIPLES-CNT, END, $rapsqltriples_cnt_end"
 echo_tee "$("$exectime_sh" "RAPSQLTRIPLES-CNT" "$rapsqltriples_cnt_start" "$rapsqltriples_cnt_end")"
+### 4 WARMUP AND IMPORT VERIFICATION END ###
 
 
-### RUNQUERIES ###
+### 5 RUNQUERIES START ###
 # Target: rapsql database
 # Wait for 5 s after warmup
 sleep 5
@@ -136,13 +151,13 @@ echo_tee "RUNQUERIES, START, $runqueries_start"
 # Perform queries
 runqueries_sh=$(realpath "$basedir/runqueries.sh")
 "$runqueries_sh" "$cypher_dir" "$measurement_dir" "$exectime_sh" "$iterations" true | tee -a "$measurement_file" || exit 1
-
 runqueries_end=$(get_ts)
 echo_tee "RUNQUERIES, END, $runqueries_end"
 echo_tee "$("$exectime_sh" "RUNQUERIES" "$runqueries_start" "$runqueries_end")"
+### 5 RUNQUERIES START ###
 
 
-### CALCULATE PERFORMANCE ###
+### 6 CALCULATE PERFORMANCE START ###
 # Input: cypher_dir, measurement_dir
 # Output: exectimes.csv, performance.csv
 calcperformance_start=$(get_ts)
@@ -153,9 +168,10 @@ calcperformance_sh=$(realpath "$basedir/calcp.sh")
 calcperformance_end=$(get_ts)
 echo_tee "CALCPERFORMANCE, END, $calcperformance_end"
 echo_tee "$("$exectime_sh" "CALCPERFORMANCE" "$calcperformance_start" "$calcperformance_end")"
+### 6 CALCULATE PERFORMANCE END ###
 
 
-### MEASUREMENT END ###
 measurement_end=$(get_ts)
 echo_tee "MEASUREMENT, END, $measurement_end"
 echo_tee "$("$exectime_sh" "MEASUREMENT" "$measurement_start" "$measurement_end")"
+### 0 MEASUREMENT END ###

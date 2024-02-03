@@ -1,37 +1,42 @@
 #!/bin/bash
 
-# TODO: grammer check for graphname
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
 
-# Function to check if graphname matches the pattern
+# Function to check if graphname is allowed by lexical rules
 match_graphname_pattern() {
+  # Lexical rules as grammer for graphname of postgresql and apache age
   local graphname=$1
   local pattern="^[^0-9\W]\w*$"
-  if ! [[ $graphname =~ $pattern ]]; then
-    echo "ERROR: $graphname contains special characters or begins with digits."
+  # 1 Names beginning with pg_ are reserved for postgres system schemas
+  if [[ "$graphname" =~ ^pg_.* ]]; then
+    echo "Graphname $graphname must not begin with pg_"
     exit 1
+  # 2 Names beginning with ag_ are reserved for apache age system schemas
+  elif [[ "$graphname" =~ ^ag_.* ]]; then
+    echo "Graphname $graphname must not begin with ag_"
+    exit 1
+  # 3 No special characters or leading digits
+  elif ! [[ "$graphname" =~ $pattern ]]; then
+    echo "Graphname $graphname must not contain special characters or leading digits"
+    exit 1
+  else
+    echo "RAPSQLBENCH, GRAPH, $graphname"
   fi
 }
-  # # Grammer graph name (experimental)
-  # # 1 names beginning with pg_ or ag_ are reserved for system schemas
-  # # 2 no white spaces
-  # # 3 no special characters
-  # # 4 follow lexical rules of postgresql and apache age
-  # if [[ "$graph_name" =~ ^pg_.* ]]; then
-  #   echo "Graph name must not begin with pg_"
-  #   exit 1
-  # elif [[ "$graph_name" =~ ^ag_.* ]]; then
-  #   echo "Graph name must not begin with ag_"
-  #   exit 1
-  # elif [[ "$graph_name" =~ [[:space:]] ]]; then
-  #   echo "Graph name must not contain white spaces"
-  #   exit 1
-  # elif [[ "$graph_name" =~ [^a-zA-Z0-9_] ]]; then
-  #   echo "Graph name must not contain special characters"
-  #   exit 1
-  # else
-  #   echo "YPG2RAPSQL, GRAPH, $graph_name"
-  # fi
-
 
 # Function to check if rdf2pg model option is valid
 match_model_option() {
@@ -159,8 +164,8 @@ fi
 
 # Check if -m is set, otherwise set default to 1000
 if [[ -z "$mem" ]]; then
-  echo "No -m memory input provided. Using default memory 1000 MB."
-  mem=1000
+  echo "No -m memory input provided. Using default memory 500 MB."
+  mem=500
 fi
 
 # Check if -c is set, otherwise set default to 1
@@ -219,3 +224,6 @@ main_sh=$basedir/main.sh
 # ./rapsqlbench.sh -g sp2b -l yarss -r plain -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l yars -r rplains -t 100 -m 1000 -c 1 -i 1
 # ./rapsqlbench.sh -g sp2b -l srdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g 1sp2b -l rdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g pg_1sp2b -l rdfid -r cpo3 -t 100 -m 1000 -c 1 -i 1
+# ./rapsqlbench.sh -g ag_sp2b -l yars -r cpo3 -t 100 -m 1000 -c 1 -i 1
