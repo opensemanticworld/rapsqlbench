@@ -1,6 +1,22 @@
 #!/bin/bash
 
-# Input Paths
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
+
+# Input Parameter
 cypher_dir=$1
 measurement_dir=$2
 iterations=$3
@@ -13,6 +29,8 @@ exectimes_mean_csv=$measurement_dir/exectimes-mean.csv
 performance_mean_csv=$measurement_dir/performance-mean.csv
 rowcount_csv=$measurement_dir/rowcounts.csv
 
+
+### FUNCTION DEFINITIONS START ###
 # Use input_dir as parameter that has subfolders with .txt files to extract all execution times
 function extract_execution_times {
   local input_dir=$1
@@ -31,9 +49,7 @@ function arithmetic_mean {
   local line_input=$1
   local output_csv=$2
   # calculate the arithmetic mean for each row value
-  # arithmetic_mean=$(echo "$line_input" | awk -F ',' '{sum=0; for(i=1; i<=NF; i++) sum+=$i; print sum/NF}')
   arithmetic_mean=$(echo "$line_input" | awk -F ',' '{sum=0; for(i=1; i<=NF; i++) sum+=$i; printf "%.3f", sum/NF}')
-
   # append the result to the same line in output csv file
   echo -n "$arithmetic_mean" >> "$output_csv"
 }
@@ -43,7 +59,6 @@ function geometric_mean {
   local line_input=$1
   local output_csv=$2
   # calculate the geometric mean (the nth root of the product over n number) for each row value
-  # geometric_mean=$(echo "$line_input" | awk -F ',' '{product=1; for(i=1; i<=NF; i++) product*=$i; print product^(1/NF)}')
   geometric_mean=$(echo "$line_input" | awk -F ',' '{product=1; for(i=1; i<=NF; i++) product*=$i; printf "%.3f", product^(1/NF)}')
   # append the result to a new csv file
   echo "$geometric_mean" >> "$output_csv"
@@ -54,7 +69,6 @@ function mean_of_columns {
   local input_csv=$1
   local output_csv=$2
   # calculate mean values of each column in a csv file and append them to a new comma-separated csv file
-  # awk -F ',' 'NR>1 {for(i=1; i<=NF; i++) sum[i]+=$i; count++} END {for(i=1; i<=NF; i++) printf "%s,", sum[i]/count; printf "\n"}' "$input_csv" >> "$output_csv"
   awk -F ',' 'NR>1 {for(i=1; i<=NF; i++) sum[i]+=$i; count++} END {for(i=1; i<=NF; i++) printf "%.3f,", sum[i]/count; printf "\n"}' "$input_csv" >> "$output_csv"
 }
 
@@ -75,6 +89,7 @@ function calc_metrics {
 }
 
 # Use input_dir as parameter that has subfolders with .txt files to extract all row counts detected by buzzword row of tail
+# ! Important to sort the output by the folder name, otherwise 10 will be before 2
 function extract_row_cnts {
   local input_dir=$1
   local csv_file=$2
@@ -88,7 +103,6 @@ function extract_row_cnts {
         if [[ -n "$row_cnt" ]]; then
           echo -n ","
           echo -n "$row_cnt" | sed -n 's/.*(\([0-9]*\) .*/\1/p'
-          # echo -n "$output" | sed -n 's/.*(\([0-9]*\).* .*/\1/p'
         else
           echo -n ",--"
         fi
@@ -96,9 +110,10 @@ function extract_row_cnts {
     fi
   done
 }
+### FUNCTION DEFINITIONS START ###
 
 
-### RESULTS ###
+### EXTRACT AND CALCULATE BENCHMARK METRICS START ###
 # exectimes.csv, exectimes-mean.csv headers
 queries_header="q1,q2,q3a,q3b,q3c,q4,q5a,q5b,q6,q7,q8,q9,q10,q11,q12a,q12b,q12c"
 # performance.csv, performance-mean.csv headers
@@ -127,3 +142,5 @@ fi
 # provide all row counts for each query and iteration
 echo "$rowcount_header" > "$rowcount_csv"
 extract_row_cnts "$responses_dir" "$rowcount_csv"
+### EXTRACT AND CALCULATE BENCHMARK METRICS END ###
+

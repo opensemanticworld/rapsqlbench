@@ -27,14 +27,14 @@ apache_age_git_version: release/PG15/1.5.0
 # manual query version q6+q7 [v1], [i]terations [10] 
 # !do not use special characters or leading digits!
 # !do also not use postgres reserved beginnings (pg_, ag_, ...)!
-graph_name: sp50ky2v1i2
+graph_name: sp50ky1v1i2
 
 # Valid model options [gdm]:  yars | rdfid
 rdf2pg_model: yars
 
 # Valid transpiler options [gdm, yars, rdfid]: 
 # plain | cpo1 (=L2L) | cpo2 (=L2R) | cpo3 (=L2L+L2R) 
-rapsql_transpiler: cpo2
+rapsql_transpiler: cpo1
 
 # Version of manual query designs: q6, q7 [yars, rdfid]
 # Valid options: v1 | v2
@@ -75,3 +75,4 @@ statement_timeout: 30min
 # max_parallel_workers_per_gather: 4
 # max_parallel_workers: 32
 # max_parallel_maintenance_workers: 4
+

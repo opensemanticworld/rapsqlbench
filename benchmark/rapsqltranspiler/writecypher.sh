@@ -1,5 +1,22 @@
 #!/bin/bash
 
+# /* 
+#    Copyright 2023 Andreas Raeder, https://github.com/raederan
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+# */
+
+# Input parameter
 graph_name=$1
 query_dir=$2
 model=$3
@@ -7,7 +24,8 @@ transpiler=$4
 # !q6 and q7 unsupported by rapsqltranspiler yet (manual versions)
 man_qv67=$5
 
-### Rapsqltranspiler version ###
+
+### RAPSQLTRANSPILER VERSION START ###
 # Provide transpiler version 
 # Version grammer: vMAJOR.MINOR.PATCH
 # Major is hardcoded yet
@@ -30,8 +48,10 @@ elif [[ $transpiler == "cpo3" ]]; then
 fi
 # Set version
 version="v$major.$minor.$patch"
+### RAPSQLTRANSPILER VERSION START ###
 
-### Paths ###
+
+# Paths
 sparql_dir="$query_dir/sparql"
 cypher_dir="$query_dir/cypher/$graph_name"
 dir_path=$(dirname "$(realpath "$0")")
@@ -42,7 +62,8 @@ q6provider_sh="$dir_path/manual-queries/$model/$man_qv67/q6provider.sh"
 q7provider_sh="$dir_path/manual-queries/$model/$man_qv67/q7provider.sh"
 
 
-### Create base file for cypher query as sql file ###
+### FUNCTIONS TO CREATE FILE-BASED SQL STATEMENTS START ###
+# Function create AGE sql basefiles
 sql_create_basefile() {
   local sql_file="$1"
   keyword="$(basename "$sql_file" .sql)"
@@ -56,7 +77,7 @@ SET search_path TO ag_catalog;
 " > "$sql_file"
 }
 
-### Provider manual cypher transformation (q6.sparql and q7.sparql) ###
+# Provider manual cypher transformation (q6.sparql and q7.sparql)
 manual_s2c() {
   local provider_sh="$1"
   local graph_name="$2"
@@ -65,7 +86,7 @@ manual_s2c() {
   "$provider_sh" "$graph_name" > "$file_path" || exit 1
 }
 
-### Provider sparql to cypher transpiled query (all other sparql queries) ###
+# Provider sparql to cypher transpiled query (all other sparql queries)
 transpiler_s2c() {
   local sparql_file="$1"
   local graph_name="$2"
@@ -73,11 +94,13 @@ transpiler_s2c() {
   sql_create_basefile "$file_path"
   java -jar "$rapsqltranspiler_jar" "$graph_name" "$sparql_file" >> "$file_path" || exit 1
 }
+### FUNCTIONS TO CREATE FILE-BASED SQL STATEMENTS END ###
 
-### Transform all sparql queries to cypher queries ###
+
+### RAPSQLTRANSPILER TRANSFORM SPARQL TO CYPHER START
 for sparql_file in "$sparql_dir"/*.sparql; do
 
-  # transform sparql_file name into .sql instead of .sparql
+  # transform sparql_file names into .sql instead of .sparql
   sql_name=$(basename "$sparql_file" .sparql).sql
 
   # use manual cypher transformation by providers for q6.sparql and q7.sparql
@@ -95,4 +118,7 @@ for sparql_file in "$sparql_dir"/*.sparql; do
 
 done
 
+# wait for all background processes to finish
 wait
+### RAPSQLTRANSPILER TRANSFORM SPARQL TO CYPHER START
+
